@@ -5,5 +5,5 @@
 !*.cc
 !*.h
 !*.hpp
-!Makefile
+!CMakeLists.txt
 !.gitignore
