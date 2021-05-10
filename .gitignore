@@ -18,3 +18,5 @@
 !.**/*.vcproj
 !.**/*.sln
 !CMakeLists.txt
+cmake-build-debug/
+.idea/
