@@ -8,7 +8,7 @@ include_directories(tools/input)
 
 add_executable(Shell
         core/cmd.cpp
-        core/cmd.hpp
+        core/cmd.h
         tools/input/read.cpp
-        tools/input/read.hpp
+        tools/input/read.h
         main.cpp)
