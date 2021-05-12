@@ -7,19 +7,32 @@ using namespace std;
 
 void cmd::cmd_loop() {
     char *line;
-    int status = 1;
 
     do {
-        cout << prompt << "> ";
+        cout << this->prompt << "> ";
         line = read_line();
-    } while (status);
+        char *command;
+        for (int i = 0; line[i] == '\0' || line[i] == ' '; ++i) {
+
+        }
+    } while (this->status);
 }
 
 cmd::cmd() {
     struct passwd *pw = getpwuid(getuid());
-    const char *homedir = pw->pw_dir;
-    char buf[80];
-    getcwd(buf, sizeof(buf));
-    this->prompt += (string)pw->pw_name;
-    this->prompt += "@";
+
+    // set home path
+    home = pw->pw_dir;
+
+    // set prompt
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+    this->prompt += (string) pw->pw_name;
 }
+
+void cmd::do_cd(const char *path) {
+    chdir(path);
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+}
+

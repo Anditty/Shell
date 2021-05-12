@@ -3,9 +3,6 @@
 
 int main()
 {
-    // Load config files, if any.
-
-
     // Run command loop.
     cmd *my_cmd = new cmd();
     my_cmd->cmd_loop();

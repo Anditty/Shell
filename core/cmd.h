@@ -14,6 +14,14 @@ public:
     cmd();
     void cmd_loop();
 
+    //commands
+    void do_cd(const char* path);
+
+    //
+    int checkStatus();
 private:
+    int status;
+    string home;
     string prompt;
+
 };
