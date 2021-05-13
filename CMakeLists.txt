@@ -12,3 +12,4 @@ add_executable(Shell
         tools/input/read.cpp
         tools/input/read.h
         main.cpp)
+add_executable(testCase test.cpp)

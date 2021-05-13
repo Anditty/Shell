@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 #include <string>
 #include <sys/types.h>
@@ -14,13 +15,17 @@ public:
     cmd();
     void cmd_loop();
 
-    //commands
-    void do_cd(const char* path);
+    // default
+    void do_default(const char *command);
 
-    //
+    // commands
+    void do_cd(const char *path);
+
+    // check shell status
     int checkStatus();
 private:
     int status;
+    string user;
     string home;
     string prompt;
 
