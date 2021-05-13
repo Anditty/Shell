@@ -18,7 +18,6 @@ int main(){
 
     int pid = fork();
     if (pid == 0){
-        //cout << "child" << endl;
         char **arg = new char *[3];
 
         arg[0] = (char *)str.c_str();
