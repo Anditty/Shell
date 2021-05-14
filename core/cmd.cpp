@@ -7,26 +7,30 @@ using namespace std;
 
 void cmd::cmd_loop() {
     char *line;
-
     do {
         cout << this->prompt << "> ";
         line = read_line();
 
-        // analysis input
-//        char*  command = new char[20];
-//        int stop_index = 0;
-//        for (int i = 0; line[i] != '\0' && line[i] != ' '; ++i) {
-//            command[i] = line[i];
-//            stop_index++;
-//        }
-//        command[stop_index] = '\0';
-//        cout << command << endl;
-        do_cd(line);
+        do_exit();
+
         this->status = checkStatus();
     } while (this->status);
 }
 
 cmd::cmd() {
+    // set builtin commands
+    char *builtin_Str[] = {
+            "cd",
+            "help",
+            "exit"
+    };
+    int commands_number = sizeof(builtin_Str)/ sizeof(builtin_Str[0]);
+    this->builtin_commands = new char*[commands_number];
+    for (int i = 0; i < commands_number; ++i) {
+        builtin_commands[i] = builtin_Str[i];
+    }
+
+    // get some system information
     struct passwd *pw = getpwuid(getuid());
 
     // set home path
@@ -60,7 +64,7 @@ void cmd::do_cd(const char *path) {
     }
 
     // change directory
-    if (chdir(path) != 0){
+    if (chdir(path) != 0) {
         // if it is a relative path
         string target = cur_path;
         target += "/";
@@ -75,7 +79,13 @@ void cmd::do_cd(const char *path) {
     this->prompt += cur_path;
 }
 
-int cmd::checkStatus() {
-    return (int)this->prompt.size();
+void cmd::do_exit() {
+    exit(0);
 }
+
+
+int cmd::checkStatus() {
+    return (int) this->prompt.size();
+}
+
 

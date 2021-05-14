@@ -16,10 +16,11 @@ public:
     void cmd_loop();
 
     // default
-    void do_default(const char *command);
+    static void do_default(const char *command);
 
     // commands
     void do_cd(const char *path);
+    static void do_exit();
 
     // check shell status
     int checkStatus();
@@ -28,5 +29,6 @@ private:
     string user;
     string home;
     string prompt;
+    char **builtin_commands;
 
 };
