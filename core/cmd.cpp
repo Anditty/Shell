@@ -21,7 +21,7 @@ void cmd::cmd_loop() {
 //        }
 //        command[stop_index] = '\0';
 //        cout << command << endl;
-
+        do_cd(line);
         this->status = checkStatus();
     } while (this->status);
 }
@@ -49,17 +49,26 @@ void cmd::do_default(const char *command) {
 }
 
 void cmd::do_cd(const char *path) {
+    // get current path
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+
     // replace ~
     if (path[0] == '~') {
         path++;
+        path = (this->home + string(path)).c_str();
     }
-    path = (this->home + string(path)).c_str();
 
     // change directory
-    chdir(path);
+    if (chdir(path) != 0){
+        // if it is a relative path
+        string target = cur_path;
+        target += "/";
+        target += string(path);
+        chdir(target.c_str());
+    }
 
     // update prompt
-    char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
     this->prompt = this->user;
     this->prompt += "@";
