@@ -49,6 +49,7 @@ void cmd::cmd_loop() {
                     do_cd(command[1]);
                     break;
                 case 1:
+                    do_help();
                     break;
                 case 2:
                     do_exit();
@@ -109,6 +110,12 @@ void cmd::do_exit() {
 
 int cmd::checkStatus() {
     return (int) this->prompt.size();
+}
+
+void cmd::do_help() {
+    for (int i = 0; i < this->builtin_map.size(); ++i) {
+        cout << this->builtin_commands[i] << endl;
+    }
 }
 
 
