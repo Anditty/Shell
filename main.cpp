@@ -4,7 +4,7 @@
 
 int main()
 {
-    char **args = split("ls -l | aaas");
+    char **args = split_command("ls -l | aaas");
 
     // Run command loop.
     cmd *my_cmd = new cmd();

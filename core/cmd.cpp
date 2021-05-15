@@ -1,21 +1,8 @@
-#include <iostream>
-#include <unistd.h>
+
 
 #include "cmd.h"
 
 using namespace std;
-
-void cmd::cmd_loop() {
-    char *line;
-    do {
-        cout << this->prompt << "> ";
-        line = read_line();
-
-        do_exit();
-
-        this->status = checkStatus();
-    } while (this->status);
-}
 
 cmd::cmd() {
     // set builtin commands
@@ -24,10 +11,11 @@ cmd::cmd() {
             "help",
             "exit"
     };
-    int commands_number = sizeof(builtin_Str)/ sizeof(builtin_Str[0]);
-    this->builtin_commands = new char*[commands_number];
+    int commands_number = sizeof(builtin_Str) / sizeof(builtin_Str[0]);
+    this->builtin_commands = new char *[commands_number];
     for (int i = 0; i < commands_number; ++i) {
         builtin_commands[i] = builtin_Str[i];
+        this->builtin_map.insert(pair<string, int>(builtin_commands[i], i));
     }
 
     // get some system information
@@ -48,8 +36,44 @@ cmd::cmd() {
     this->status = 1;
 }
 
-void cmd::do_default(const char *command) {
-    system(command);
+void cmd::cmd_loop() {
+    char *line;
+    do {
+        cout << this->prompt << "> ";
+        line = read_line();
+
+        char **command = split_command(line);
+        if (this->builtin_map.count(command[0])){
+            switch (this->builtin_map[command[0]]) {
+                case 0:
+                    do_cd(command[1]);
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    do_exit();
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            do_default(command);
+        }
+
+
+        this->status = checkStatus();
+    } while (this->status);
+}
+
+void cmd::do_default(char *const *command) {
+    int pid = fork();
+    if (pid == 0) {
+        // Child process
+        execvp(command[0], command);
+    } else {
+        int child_status;
+        waitpid(pid, &child_status, 0);
+    }
 }
 
 void cmd::do_cd(const char *path) {
@@ -82,7 +106,6 @@ void cmd::do_cd(const char *path) {
 void cmd::do_exit() {
     exit(0);
 }
-
 
 int cmd::checkStatus() {
     return (int) this->prompt.size();

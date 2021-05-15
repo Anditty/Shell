@@ -9,5 +9,5 @@
 
 using namespace std;
 
-char** split(const string& command);
+char** split_command(const string& command);
 vector<string> split_to_vec(const string& command);

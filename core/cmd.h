@@ -4,10 +4,15 @@
 #include <string>
 #include <sys/types.h>
 #include <pwd.h>
+#include <iostream>
+#include <unistd.h>
+
+#include "map"
+
+#include "../tools/parse/parseCommand.h"
+#include "../tools/input/read.h"
 
 using namespace std;
-
-#include "../tools/input/read.h"
 
 class cmd
 {
@@ -16,7 +21,7 @@ public:
     void cmd_loop();
 
     // default
-    static void do_default(const char *command);
+    static void do_default(char * const*command);
 
     // commands
     void do_cd(const char *path);
@@ -30,5 +35,5 @@ private:
     string home;
     string prompt;
     char **builtin_commands;
-
+    map<string, int>builtin_map;
 };
