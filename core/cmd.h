@@ -28,6 +28,9 @@ public:
     void do_help();
     static void do_exit();
 
+    // handler
+    void pipe_handler(char * const*command, int position);
+
     // check shell status
     int checkStatus();
 private:

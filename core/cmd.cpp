@@ -43,7 +43,10 @@ void cmd::cmd_loop() {
         line = read_line();
 
         char **command = split_command(line);
-        if (this->builtin_map.count(command[0])){
+        if (find_pipe(command) != -1) {
+            pipe_handler(command, find_pipe(command));
+        }
+        if (this->builtin_map.count(command[0])) {
             switch (this->builtin_map[command[0]]) {
                 case 0:
                     do_cd(command[1]);
@@ -57,7 +60,7 @@ void cmd::cmd_loop() {
                 default:
                     break;
             }
-        }else{
+        } else {
             do_default(command);
         }
 
@@ -70,7 +73,11 @@ void cmd::do_default(char *const *command) {
     int pid = fork();
     if (pid == 0) {
         // Child process
-        execvp(command[0], command);
+        int status = 0;
+        status = execvp(command[0], command);
+        if (status == -1){
+            exit(0);
+        }
     } else {
         int child_status;
         waitpid(pid, &child_status, 0);
@@ -116,6 +123,37 @@ void cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
         cout << this->builtin_commands[i] << endl;
     }
+}
+
+void cmd::pipe_handler(char *const *command, int position) {
+    char *command_1[20];
+    int index_1 = 0;
+    char *command_2[20];
+    int index_2 = 0;
+
+    for (int i = 0; i < position; ++i) {
+        command_1[i] = command[i];
+        index_1++;
+    }
+    command_1[position] = nullptr;
+
+    for (int i = position + 1; command[i] != nullptr; ++i) {
+        command_2[index_2] = command[i];
+        index_2++;
+    }
+    command_2[index_2] = nullptr;
+
+    cout << "command 1: \n";
+    for (int i = 0; i < index_1; ++i) {
+        cout << command_1[i] << " ";
+    }
+
+    cout << "\ncommand 2: \n";
+    for (int i = 0; i < index_2; ++i) {
+        cout << command_2[i] << " ";
+    }
+    cout << endl;
+
 }
 
 
