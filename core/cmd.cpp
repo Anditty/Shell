@@ -8,6 +8,8 @@ cmd::cmd() {
     // set builtin commands
     char *builtin_Str[] = {
             "cd",
+            "find",
+            "grep",
             "help",
             "exit"
     };
@@ -44,24 +46,33 @@ void cmd::cmd_loop() {
 
         char **command = split_command(line);
         if (find_pipe(command) != -1) {
+            // handle pipe
             pipe_handler(command, find_pipe(command));
-        }
-        if (this->builtin_map.count(command[0])) {
-            switch (this->builtin_map[command[0]]) {
-                case 0:
-                    do_cd(command[1]);
-                    break;
-                case 1:
-                    do_help();
-                    break;
-                case 2:
-                    do_exit();
-                    break;
-                default:
-                    break;
+        } else{
+            // normal condition
+            if (this->builtin_map.count(command[0])) {
+                switch (this->builtin_map[command[0]]) {
+                    case 0:
+                        do_cd(command[1]);
+                        break;
+                    case 1:
+                        do_find(command[1]);
+                        break;
+                    case 2:
+                        do_grep(command[1]);
+                        break;
+                    case 3:
+                        do_help();
+                        break;
+                    case 4:
+                        do_exit();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                do_default(command);
             }
-        } else {
-            do_default(command);
         }
 
 
@@ -111,18 +122,26 @@ void cmd::do_cd(const char *path) {
     this->prompt += cur_path;
 }
 
-void cmd::do_exit() {
-    exit(0);
+void cmd::do_find(const char *file_name) {
+
 }
 
-int cmd::checkStatus() {
-    return (int) this->prompt.size();
+void cmd::do_grep(const char *pattern) {
+
 }
 
 void cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
         cout << this->builtin_commands[i] << endl;
     }
+}
+
+void cmd::do_exit() {
+    exit(0);
+}
+
+int cmd::checkStatus() {
+    return (int) this->prompt.size();
 }
 
 void cmd::pipe_handler(char *const *command, int position) {
@@ -143,17 +162,47 @@ void cmd::pipe_handler(char *const *command, int position) {
     }
     command_2[index_2] = nullptr;
 
-    cout << "command 1: \n";
-    for (int i = 0; i < index_1; ++i) {
-        cout << command_1[i] << " ";
-    }
+//    cout << "command 1: \n";
+//    for (int i = 0; i < index_1; ++i) {
+//        cout << command_1[i] << " ";
+//    }
+//
+//    cout << "\ncommand 2: \n";
+//    for (int i = 0; i < index_2; ++i) {
+//        cout << command_2[i] << " ";
+//    }
+//    cout << endl;
 
-    cout << "\ncommand 2: \n";
-    for (int i = 0; i < index_2; ++i) {
-        cout << command_2[i] << " ";
+    // 0: data read; 1: data write
+    int data_pipe[2];
+    pipe(data_pipe);
+
+    int pid_1 = fork();
+    if (pid_1 == 0){
+        // child 1
+        close(data_pipe[0]);
+        dup2(data_pipe[1], 1); // copy std out to pipe write
+        close(data_pipe[1]);
+        execvp(command_1[0], command_1);
+    } else{
+        int pid_2 = fork();
+        if (pid_2 == 0){
+            // child 2
+            close(data_pipe[1]);
+            dup2(data_pipe[0], 0);// copy std in to pipe read
+            close(data_pipe[0]);
+            execvp(command_2[0], command_2);
+        } else{
+            close(data_pipe[0]);
+            close(data_pipe[1]);
+            int child_status;
+            waitpid(pid_1, &child_status, 0);
+            waitpid(pid_2, &child_status, 0);
+        }
     }
-    cout << endl;
 
 }
+
+
 
 

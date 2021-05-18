@@ -25,6 +25,8 @@ public:
 
     // commands
     void do_cd(const char *path);
+    void do_find(const char *file_name);
+    void do_grep(const char *pattern);
     void do_help();
     static void do_exit();
 
