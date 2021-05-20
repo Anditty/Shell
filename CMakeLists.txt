@@ -11,5 +11,5 @@ add_executable(Shell
         core/cmd.h
         tools/input/read.cpp
         tools/input/read.h
-        main.cpp tools/parse/parseCommand.cpp tools/parse/parseCommand.h)
+        main.cpp tools/parse/parseCommand.cpp tools/parse/parseCommand.h tools/check/check.cpp tools/check/check.h)
 add_executable(testCase test.cpp)

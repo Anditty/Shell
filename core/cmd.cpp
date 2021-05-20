@@ -84,6 +84,7 @@ void cmd::cmd_loop() {
     } while (this->status);
 }
 
+// when the command is not a built in command
 void cmd::do_default(char *const *command) {
     int pid = fork();
     if (pid == 0) {
@@ -99,6 +100,7 @@ void cmd::do_default(char *const *command) {
     }
 }
 
+// change dir to path
 void cmd::do_cd(const char *path) {
     // get current path
     char cur_path[80];
@@ -126,6 +128,7 @@ void cmd::do_cd(const char *path) {
     this->prompt += cur_path;
 }
 
+// show files in dir_name
 vector<string> cmd::do_ls(const char *dir_name) {
     vector<string> files;
     DIR *dir;
@@ -152,20 +155,28 @@ vector<string> cmd::do_ls(const char *dir_name) {
     return files;
 }
 
+// find a file in given dir
 void cmd::do_find(const char *dir_name, const char *file_name) {
+    string target_dir = dir_name == nullptr ? this->home : dir_name;
+    string target_file = file_name;
+
+    vector<string> files;
 
 }
 
+// filter the input by pattern
 void cmd::do_grep(const char *pattern) {
 
 }
 
+// show something about built in commands
 void cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
         cout << this->builtin_commands[i] << endl;
     }
 }
 
+// exit shell
 void cmd::do_exit() {
     exit(0);
 }
@@ -174,6 +185,7 @@ int cmd::checkStatus() {
     return (int) this->prompt.size();
 }
 
+// when input contains a "|"
 void cmd::pipe_handler(char *const *command, int position) {
     char *command_1[20];
     int index_1 = 0;

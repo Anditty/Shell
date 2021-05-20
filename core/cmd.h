@@ -18,6 +18,7 @@
 
 #include "../tools/parse/parseCommand.h"
 #include "../tools/input/read.h"
+#include "../tools/check/check.h"
 
 using namespace std;
 
@@ -28,9 +29,12 @@ public:
     void cmd_loop();
 
     // default
+
     static void do_default(char * const*command);
 
+
     // commands
+
     void do_cd(const char *path);
     static vector<string> do_ls(const char *dir_name);
     void do_find(const char *dir_name, const char *file_name);
@@ -38,10 +42,13 @@ public:
     void do_help();
     static void do_exit();
 
+
     // handler
+
     static void pipe_handler(char * const*command, int position);
 
     // check shell status
+
     int checkStatus();
 private:
     int status;
