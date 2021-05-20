@@ -11,7 +11,8 @@ cmd::cmd() {
             "find",
             "grep",
             "help",
-            "exit"
+            "exit",
+            "ls"
     };
     int commands_number = sizeof(builtin_Str) / sizeof(builtin_Str[0]);
     this->builtin_commands = new char *[commands_number];
@@ -48,7 +49,7 @@ void cmd::cmd_loop() {
         if (find_pipe(command) != -1) {
             // handle pipe
             pipe_handler(command, find_pipe(command));
-        } else{
+        } else {
             // normal condition
             if (this->builtin_map.count(command[0])) {
                 switch (this->builtin_map[command[0]]) {
@@ -66,6 +67,9 @@ void cmd::cmd_loop() {
                         break;
                     case 4:
                         do_exit();
+                        break;
+                    case 5:
+                        do_ls(command[1]);
                         break;
                     default:
                         break;
@@ -86,7 +90,7 @@ void cmd::do_default(char *const *command) {
         // Child process
         int status = 0;
         status = execvp(command[0], command);
-        if (status == -1){
+        if (status == -1) {
             exit(0);
         }
     } else {
@@ -120,6 +124,32 @@ void cmd::do_cd(const char *path) {
     this->prompt = this->user;
     this->prompt += "@";
     this->prompt += cur_path;
+}
+
+vector<string> cmd::do_ls(const char *dir_name) {
+    vector<string> files;
+    DIR *dir;
+    struct dirent *ptr;
+    string ls_dir = dir_name == nullptr ? "./" : dir_name;
+
+    if ((dir = opendir(ls_dir.c_str())) == nullptr) {
+        perror("Open dir error...");
+        return files;
+    }
+
+    while ((ptr = readdir(dir)) != nullptr) {
+        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
+            continue;
+        files.emplace_back(ptr->d_name);
+    }
+    closedir(dir);
+
+    for (const auto &item : files){
+        cout << item << " ";
+    }
+    cout << endl;
+
+    return files;
 }
 
 void cmd::do_find(const char *dir_name, const char *file_name) {
@@ -167,21 +197,21 @@ void cmd::pipe_handler(char *const *command, int position) {
     pipe(data_pipe);
 
     int pid_1 = fork();
-    if (pid_1 == 0){
+    if (pid_1 == 0) {
         // child 1
         close(data_pipe[0]);
         dup2(data_pipe[1], 1); // copy std out to pipe write
         close(data_pipe[1]);
         execvp(command_1[0], command_1);
-    } else{
+    } else {
         int pid_2 = fork();
-        if (pid_2 == 0){
+        if (pid_2 == 0) {
             // child 2
             close(data_pipe[1]);
             dup2(data_pipe[0], 0);// copy std in to pipe read
             close(data_pipe[0]);
             execvp(command_2[0], command_2);
-        } else{
+        } else {
             close(data_pipe[0]);
             close(data_pipe[1]);
             int child_status;
@@ -191,6 +221,8 @@ void cmd::pipe_handler(char *const *command, int position) {
     }
 
 }
+
+
 
 
 

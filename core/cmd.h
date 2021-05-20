@@ -6,7 +6,14 @@
 #include <pwd.h>
 #include <iostream>
 #include <unistd.h>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <unistd.h>
+#include <dirent.h>
 
+#include "vector"
 #include "map"
 
 #include "../tools/parse/parseCommand.h"
@@ -25,6 +32,7 @@ public:
 
     // commands
     void do_cd(const char *path);
+    static vector<string> do_ls(const char *dir_name);
     void do_find(const char *dir_name, const char *file_name);
     void do_grep(const char *pattern);
     void do_help();

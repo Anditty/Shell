@@ -1,40 +1,64 @@
-#include <string>
-#include <algorithm>
-#include <sstream>
 #include <iostream>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+#ifdef linux
+
 #include <unistd.h>
-#include <sys/wait.h>
+#include <dirent.h>
+
+#endif
+
 #include "vector"
+
+using namespace std;
 
 //
 // Created by edison on 2021/5/13.
 //
 using namespace std;
 
-int main(){
-    string str = "ls";
-    string a = "-l";
-    //replace(str.begin(), str.end(), ':', ' ');  // replace ':' by ' '
+int main() {
+    vector<string> files;//存放文件名
+    DIR *dir;
+    struct dirent *ptr;
+    char base[1000];
+    string cate_dir;
 
-    int pid = fork();
-    if (pid == 0){
-        char **arg = new char *[3];
+    cin >> cate_dir;
 
-        arg[0] = (char *)str.c_str();
-        arg[1] = (char *)a.c_str();
+    if ((dir = opendir(cate_dir.c_str())) == nullptr) {
+        perror("Open dir error...");
+        exit(1);
+    }
 
-        execvp(arg[0], arg);
-    } else{
-        int child_status;
-        waitpid(pid, &child_status, 0);
-        vector<string> array;
-        stringstream ss(str);
-        string temp;
-        while (ss >> temp)
-            array.push_back(temp); // done! now array={102,330,3133,76531,451,000,12,44412}
-        for (const string& i : array) {
-            cout << i.c_str() << endl;
+    while ((ptr = readdir(dir)) != nullptr) {
+        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
+            continue;
+        else if (ptr->d_type == 8)    ///file
+            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
+            files.emplace_back(ptr->d_name);
+        else if (ptr->d_type == 10)    ///link file
+            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
+            continue;
+        else if (ptr->d_type == 4)    ///dir
+        {
+            files.emplace_back(ptr->d_name);
+            /*
+                memset(base,'\0',sizeof(base));
+                strcpy(base,basePath);
+                strcat(base,"/");
+                strcat(base,ptr->d_nSame);
+                readFileList(base);
+            */
         }
+    }
+    closedir(dir);
+
+
+    for (const auto &item : files){
+        cout << item << " ";
     }
 
     return 0;
