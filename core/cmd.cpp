@@ -23,16 +23,20 @@ cmd::cmd() {
 
     // get some system information
     struct passwd *pw = getpwuid(getuid());
+    char cur_hostname[32];
+    gethostname(cur_hostname, 32);
 
     // set home path
     this->home = pw->pw_dir;
     this->user = pw->pw_name;
+    this->hostname = cur_hostname;
 
     // set prompt
     char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
     this->prompt += (string) pw->pw_name;
     this->prompt += "@";
+    this->prompt += this->hostname + " ";
     this->prompt += cur_path;
 
     //set status
@@ -125,6 +129,7 @@ void cmd::do_cd(const char *path) {
     getcwd(cur_path, sizeof(cur_path));
     this->prompt = this->user;
     this->prompt += "@";
+    this->prompt += this->hostname + " ";
     this->prompt += cur_path;
 }
 
