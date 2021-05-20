@@ -44,10 +44,18 @@ cmd::cmd() {
 }
 
 void cmd::cmd_loop() {
-    char *line;
+    string line;
     do {
         cout << this->prompt << "> ";
         line = read_line();
+
+
+        // need to deal with space " "
+        //...
+
+        if (line.empty()) {
+            continue;
+        }
 
         char **command = split_command(line);
         if (find_pipe(command) != -1) {
@@ -152,7 +160,7 @@ vector<string> cmd::do_ls(const char *dir_name) {
     }
     closedir(dir);
 
-    for (const auto &item : files){
+    for (const auto &item : files) {
         cout << item << " ";
     }
     cout << endl;
