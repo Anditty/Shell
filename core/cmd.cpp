@@ -56,7 +56,7 @@ void cmd::cmd_loop() {
                         do_cd(command[1]);
                         break;
                     case 1:
-                        do_find(command[1]);
+                        do_find(command[1], nullptr);
                         break;
                     case 2:
                         do_grep(command[1]);
@@ -122,7 +122,7 @@ void cmd::do_cd(const char *path) {
     this->prompt += cur_path;
 }
 
-void cmd::do_find(const char *file_name) {
+void cmd::do_find(const char *dir_name, const char *file_name) {
 
 }
 
@@ -161,17 +161,6 @@ void cmd::pipe_handler(char *const *command, int position) {
         index_2++;
     }
     command_2[index_2] = nullptr;
-
-//    cout << "command 1: \n";
-//    for (int i = 0; i < index_1; ++i) {
-//        cout << command_1[i] << " ";
-//    }
-//
-//    cout << "\ncommand 2: \n";
-//    for (int i = 0; i < index_2; ++i) {
-//        cout << command_2[i] << " ";
-//    }
-//    cout << endl;
 
     // 0: data read; 1: data write
     int data_pipe[2];
