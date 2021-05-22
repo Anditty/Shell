@@ -6,7 +6,7 @@ using namespace std;
 
 cmd::cmd() {
     // set builtin commands
-    char *builtin_Str[] = {
+    this->builtin_commands=new string[] {
             "cd",
             "find",
             "grep",
@@ -14,10 +14,11 @@ cmd::cmd() {
             "exit",
             "ls"
     };
-    int commands_number = sizeof(builtin_Str) / sizeof(builtin_Str[0]);
-    this->builtin_commands = new char *[commands_number];
+    //数组长度
+    int commands_number = sizeof(builtin_commands) / sizeof(builtin_commands[0]);
+    this->builtin_commands = new string[commands_number];
     for (int i = 0; i < commands_number; ++i) {
-        builtin_commands[i] = builtin_Str[i];
+        //命令到编号的映射
         this->builtin_map.insert(pair<string, int>(builtin_commands[i], i));
     }
 
@@ -177,19 +178,17 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
     queue<string> dir_list;
     dir_list.push(dir_name);
 
-    while (!dir_list.empty()){
+    while (!dir_list.empty()) {
         string cur_dir = dir_list.front();
         dir_list.pop();
         vector<pair<string, int>> files = do_ls(dir_name);
-        for (const auto &item : files){
-            if (item.first == target_file){
-                const string& full_name = cur_dir;
+        for (const auto &item : files) {
+            if (item.first == target_file) {
+                const string &full_name = cur_dir;
 
             }
         }
     }
-
-
 
 
 }
