@@ -142,8 +142,8 @@ void cmd::do_cd(const char *path) {
 }
 
 // show files in dir_name
-vector<string> cmd::do_ls(const char *dir_name) {
-    vector<string> files;
+vector<pair<string, int>> cmd::do_ls(const char *dir_name) {
+    vector<pair<string, int>> files;
     DIR *dir;
     struct dirent *ptr;
     string ls_dir = dir_name == nullptr ? "./" : dir_name;
@@ -156,12 +156,13 @@ vector<string> cmd::do_ls(const char *dir_name) {
     while ((ptr = readdir(dir)) != nullptr) {
         if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
             continue;
-        files.emplace_back(ptr->d_name);
+        // d_type: 8 is file; 4 is dir
+        files.emplace_back(pair<string, int>(ptr->d_name, ptr->d_type));
     }
     closedir(dir);
 
     for (const auto &item : files) {
-        cout << item << " ";
+        cout << item.first << " ";
     }
     cout << endl;
 
@@ -173,7 +174,23 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
     string target_dir = dir_name == nullptr ? this->home : dir_name;
     string target_file = file_name;
 
-    vector<string> files;
+    queue<string> dir_list;
+    dir_list.push(dir_name);
+
+    while (!dir_list.empty()){
+        string cur_dir = dir_list.front();
+        dir_list.pop();
+        vector<pair<string, int>> files = do_ls(dir_name);
+        for (const auto &item : files){
+            if (item.first == target_file){
+                const string& full_name = cur_dir;
+
+            }
+        }
+    }
+
+
+
 
 }
 
