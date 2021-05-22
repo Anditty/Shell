@@ -17,7 +17,7 @@ cmd::cmd() {
             "ls"
     };
 
-    this->builtin_commands = new string[commands_number];
+
     for (int i = 0; i < commands_number; ++i) {
         //命令到编号的映射
         this->builtin_map.insert(pair<string, int>(builtin_commands[i], i));
