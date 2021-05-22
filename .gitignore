@@ -1,7 +1,7 @@
 *
 !.gitignore
 !*/
-!*.cpp
+
 !*.cxx
 !*.c
 !*.cc
@@ -9,7 +9,7 @@
 !*.h
 !*.vcproj
 !*.sln
-!.**/*.cpp
+
 !.**/*.cxx
 !.**/*.c
 !.**/*.cc
