@@ -18,57 +18,22 @@ using namespace std;
 // Created by edison on 2021/5/13.
 //
 using namespace std;
-
+string trim(string &s);
 int main() {
-    char hostname[32];
-    gethostname(hostname, 32);
-    cout << hostname;
-
+    string s="  1   ";
+    cout<<trim(s);
     return 0;
 }
+string trim(string &s)
+{
+    if (s.empty())
+    {
+        return s;
+    }
+    s.erase(0,s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
 
-// rubbish
-//
-//    vector<string> files;//存放文件名
-//    DIR *dir;
-//    struct dirent *ptr;
-//    char base[1000];
-//    string cate_dir;
-//
-//    cin >> cate_dir;
-//
-//    if ((dir = opendir(cate_dir.c_str())) == nullptr) {
-//        perror("Open dir error...");
-//        exit(1);
-//    }
-//
-//    while ((ptr = readdir(dir)) != nullptr) {
-//        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
-//            continue;
-//        else if (ptr->d_type == 8)    ///file
-//            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
-//            files.emplace_back(ptr->d_name);
-//        else if (ptr->d_type == 10)    ///link file
-//            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
-//            continue;
-//        else if (ptr->d_type == 4)    ///dir
-//        {
-//            files.emplace_back(ptr->d_name);
-//            /*
-//                memset(base,'\0',sizeof(base));
-//                strcpy(base,basePath);
-//                strcat(base,"/");
-//                strcat(base,ptr->d_nSame);
-//                readFileList(base);
-//            */
-//        }
-//    }
-//    closedir(dir);
-//
-//
-//    for (const auto &item : files){
-//        cout << item << " ";
-//    }
-//
 
 
