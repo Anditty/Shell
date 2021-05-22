@@ -59,5 +59,5 @@ private:
     string prompt;
     string hostname;
     string* builtin_commands;
-    map<string, int>builtin_map;
+    map<string , int>builtin_map;
 };

@@ -20,7 +20,7 @@ cmd::cmd() {
 
     for (int i = 0; i < commands_number; ++i) {
         //命令到编号的映射
-        this->builtin_map.insert(pair<string, int>(builtin_commands[i], i));
+        this->builtin_map.insert(pair<string , int>(builtin_commands[i], i));
     }
 
     // get some system information
@@ -72,7 +72,7 @@ void cmd::cmd_loop() {
                         do_cd(command[1]);
                         break;
                     case 1:
-                        do_find(command[1], nullptr);
+                        do_find(command[1], command[2]);
                         break;
                     case 2:
                         do_grep(command[1]);
@@ -183,16 +183,21 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
     while (!dir_list.empty()) {
         string cur_dir = dir_list.front();
         dir_list.pop();
+
         vector<pair<string, int>> files = do_ls(dir_name);
         for (const auto &item : files) {
             if (item.first == target_file) {
-                const string &full_name = cur_dir;
+                string full_name;
+                full_name += cur_dir;
+                full_name += "/";
+                full_name += target_file;
+            }
 
+            if (item.second == 4){
+                dir_list.push(item.first);
             }
         }
     }
-
-
 }
 
 // filter the input by pattern
