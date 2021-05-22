@@ -20,4 +20,4 @@
 !CMakeLists.txt
 cmake-build-debug/
 .idea/
-test.cpp
+/test.cpp
