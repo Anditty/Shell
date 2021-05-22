@@ -6,7 +6,9 @@ using namespace std;
 
 cmd::cmd() {
     // set builtin commands
-    this->builtin_commands=new string[] {
+    //数组长度
+    int commands_number =6;
+    this->builtin_commands=new string[commands_number] {
             "cd",
             "find",
             "grep",
@@ -14,8 +16,7 @@ cmd::cmd() {
             "exit",
             "ls"
     };
-    //数组长度
-    int commands_number =6;
+
     this->builtin_commands = new string[commands_number];
     for (int i = 0; i < commands_number; ++i) {
         //命令到编号的映射
