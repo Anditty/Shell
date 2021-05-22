@@ -20,6 +20,7 @@
 #include "../tools/parse/parseCommand.h"
 #include "../tools/input/read.h"
 #include "../tools/check/check.h"
+#include "../tools/trim/trim.h"
 
 using namespace std;
 

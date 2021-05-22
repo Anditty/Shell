@@ -15,7 +15,7 @@ cmd::cmd() {
             "ls"
     };
     //数组长度
-    int commands_number = sizeof(builtin_commands) / sizeof(builtin_commands[0]);
+    int commands_number =6;
     this->builtin_commands = new string[commands_number];
     for (int i = 0; i < commands_number; ++i) {
         //命令到编号的映射
@@ -49,6 +49,7 @@ void cmd::cmd_loop() {
     do {
         cout << this->prompt << "> ";
         line = read_line();
+        trim(line);
 
 
         // need to deal with space " "
