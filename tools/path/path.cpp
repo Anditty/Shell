@@ -4,13 +4,13 @@
 
 #include "path.h"
 
-string get_cur_path(){
+string get_cur_path() {
     char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
     return cur_path;
 }
 
-vector<pair<string, int>> find_files(const char *dir_name){
+vector<pair<string, int>> find_files(const char *dir_name) {
     vector<pair<string, int>> files;
     DIR *dir;
     struct dirent *ptr;

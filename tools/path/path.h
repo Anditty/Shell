@@ -12,4 +12,5 @@
 using namespace std;
 
 string get_cur_path();
+
 vector<pair<string, int>> find_files(const char *dir_name);

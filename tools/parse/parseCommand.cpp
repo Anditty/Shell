@@ -21,7 +21,7 @@ char **split_command(const string &command) {
 
 int find_pipe(char **command) {
     for (int i = 0; command[i] != nullptr; ++i) {
-        if (strcmp(command[i], "|") == 0){
+        if (strcmp(command[i], "|") == 0) {
             return i;
         }
     }
