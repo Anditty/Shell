@@ -76,7 +76,7 @@ void cmd::cmd_loop() {
                                 command[2] == nullptr ? command[1] : command[2]);
                         break;
                     case 2:
-                        do_grep(0, command[1]);
+                        do_grep(command[1], command[2]);
                         break;
                     case 3:
                         do_help();
