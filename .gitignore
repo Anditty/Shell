@@ -1,7 +1,3 @@
-*
-!main.cpp
-!./core/
-!./tools/
-!.gitignore
-!CMakeLists.txt
-!README.md
+./cmake-build-debug/
+.idea/
+test.cpp
