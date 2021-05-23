@@ -7,8 +7,8 @@ using namespace std;
 cmd::cmd() {
     // set builtin commands
     //数组长度
-    int commands_number =6;
-    this->builtin_commands=new string[commands_number] {
+    int commands_number = 6;
+    this->builtin_commands = new string[commands_number]{
             "cd",
             "find",
             "grep",
@@ -20,7 +20,7 @@ cmd::cmd() {
 
     for (int i = 0; i < commands_number; ++i) {
         //命令到编号的映射
-        this->builtin_map.insert(pair<string , int>(builtin_commands[i], i));
+        this->builtin_map.insert(pair<string, int>(builtin_commands[i], i));
     }
 
     // get some system information
@@ -72,7 +72,8 @@ void cmd::cmd_loop() {
                         do_cd(command[1]);
                         break;
                     case 1:
-                        do_find(command[1], command[2]);
+                        do_find(command[2] == nullptr ? nullptr : command[1],
+                                command[2] == nullptr ? command[1] : command[2]);
                         break;
                     case 2:
                         do_grep(command[1]);
@@ -164,37 +165,38 @@ vector<pair<string, int>> cmd::do_ls(const char *dir_name) {
     }
     closedir(dir);
 
-    for (const auto &item : files) {
-        cout << item.first << " ";
-    }
-    cout << endl;
+//    for (const auto &item : files) {
+//        cout << item.first << " ";
+//    }
+//    cout << endl;
 
     return files;
 }
 
 // find a file in given dir
 void cmd::do_find(const char *dir_name, const char *file_name) {
-    string target_dir = dir_name == nullptr ? this->home : dir_name;
+    string target_dir = dir_name == nullptr ? "./" : dir_name;
+    target_dir += "/";
     string target_file = file_name;
 
     queue<string> dir_list;
-    dir_list.push(dir_name);
+    dir_list.push(target_dir);
 
     while (!dir_list.empty()) {
         string cur_dir = dir_list.front();
         dir_list.pop();
 
-        vector<pair<string, int>> files = do_ls(dir_name);
+        vector<pair<string, int>> files = do_ls(target_dir.c_str());
         for (const auto &item : files) {
             if (item.first == target_file) {
                 string full_name;
                 full_name += cur_dir;
-                full_name += "/";
                 full_name += target_file;
+                cout << full_name << endl;
             }
 
-            if (item.second == 4){
-                dir_list.push(item.first);
+            if (item.second == 4) {
+                dir_list.push(cur_dir + item.first + "/");
             }
         }
     }

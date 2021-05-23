@@ -21,6 +21,7 @@
 #include "../tools/input/read.h"
 #include "../tools/check/check.h"
 #include "../tools/trim/trim.h"
+#include "../tools/path/pathConvert.h"
 
 using namespace std;
 
