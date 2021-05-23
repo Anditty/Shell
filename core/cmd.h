@@ -21,7 +21,7 @@
 #include "../tools/input/read.h"
 #include "../tools/check/check.h"
 #include "../tools/trim/trim.h"
-#include "../tools/path/pathConvert.h"
+#include "../tools/path/path.h"
 
 using namespace std;
 
@@ -39,7 +39,7 @@ public:
     // commands
 
     void do_cd(const char *path);
-    static vector<pair<string, int>> do_ls(const char *dir_name);
+    static void do_ls(const char *dir_name);
     static void do_find(const char *dir_name, const char *file_name);
     void do_grep(const char *pattern);
     void do_help();

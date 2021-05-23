@@ -146,31 +146,12 @@ void cmd::do_cd(const char *path) {
 }
 
 // show files in dir_name
-vector<pair<string, int>> cmd::do_ls(const char *dir_name) {
-    vector<pair<string, int>> files;
-    DIR *dir;
-    struct dirent *ptr;
-    string ls_dir = dir_name == nullptr ? "./" : dir_name;
-
-    if ((dir = opendir(ls_dir.c_str())) == nullptr) {
-        perror("Open dir error...");
-        return files;
+void cmd::do_ls(const char *dir_name) {
+    vector<pair<string, int>> files = find_files(dir_name);
+    for (const auto &item : files) {
+        cout << item.first << " ";
     }
-
-    while ((ptr = readdir(dir)) != nullptr) {
-        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
-            continue;
-        // d_type: 8 is file; 4 is dir
-        files.emplace_back(pair<string, int>(ptr->d_name, ptr->d_type));
-    }
-    closedir(dir);
-
-//    for (const auto &item : files) {
-//        cout << item.first << " ";
-//    }
-//    cout << endl;
-
-    return files;
+    cout << endl;
 }
 
 // find a file in given dir
@@ -186,7 +167,7 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
         string cur_dir = dir_list.front();
         dir_list.pop();
 
-        vector<pair<string, int>> files = do_ls(cur_dir.c_str());
+        vector<pair<string, int>> files = find_files(cur_dir.c_str());
         for (const auto &item : files) {
             if (item.first == target_file) {
                 string full_name;
