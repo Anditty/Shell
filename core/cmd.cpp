@@ -64,7 +64,9 @@ void cmd::cmd_loop() {
         if (find_pipe(command) != -1) {
             // handle pipe
             pipe_handler(command, find_pipe(command));
-        } else {
+        } else if (find_question(command) == 1){
+            question_handler(command[0]);
+        } else{
             // normal condition
             if (this->builtin_map.count(command[0])) {
                 switch (this->builtin_map[command[0]]) {
@@ -271,6 +273,10 @@ void cmd::pipe_handler(char *const *command, int position) {
             waitpid(pid_2, &child_status, 0);
         }
     }
+
+}
+
+void cmd::question_handler(const char *command) {
 
 }
 
