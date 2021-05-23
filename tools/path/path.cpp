@@ -22,7 +22,7 @@ vector<pair<string, int>> find_files(const char *dir_name) {
     }
 
     while ((ptr = readdir(dir)) != nullptr) {
-        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parrent dir
+        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)    ///current dir OR parent dir
             continue;
         // d_type: 8 is file; 4 is dir
         files.emplace_back(pair<string, int>(ptr->d_name, ptr->d_type));

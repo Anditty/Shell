@@ -219,8 +219,8 @@ void cmd::do_grep(const char *type, const char *pattern) {
         if (mode == "-n") {
             match = line.find(pattern) != string::npos;
         } else if (mode == "-r") {
-            std::regex reg(pattern);
-            match = std::regex_match(line, reg);
+            regex reg(pattern);
+            match = regex_match(line, reg);
         }
 
         if (match) {
