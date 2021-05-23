@@ -76,7 +76,7 @@ void cmd::cmd_loop() {
                                 command[2] == nullptr ? command[1] : command[2]);
                         break;
                     case 2:
-                        do_grep(command[1]);
+                        do_grep(0, command[1]);
                         break;
                     case 3:
                         do_help();
@@ -184,8 +184,15 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
 }
 
 // filter the input by pattern
-void cmd::do_grep(const char *pattern) {
-
+// parm: type: normal string(-n); regex pattern(-r)
+// parm: pattern: used to compare
+void cmd::do_grep(const char *type, const char *pattern) {
+    string line;
+    while (cin >> line){
+        if (line.find(pattern) != string::npos){
+            cout << line << endl;
+        }
+    }
 }
 
 // show something about built in commands
