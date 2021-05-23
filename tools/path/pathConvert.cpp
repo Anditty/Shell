@@ -4,7 +4,7 @@
 
 #include "pathConvert.h"
 
-string getCur(){
+string get_cur_path(){
     char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
     return cur_path;

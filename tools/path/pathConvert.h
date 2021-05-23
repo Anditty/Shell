@@ -7,4 +7,4 @@
 
 using namespace std;
 
-string getCur();
+string get_cur_path();

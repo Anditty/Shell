@@ -175,8 +175,8 @@ vector<pair<string, int>> cmd::do_ls(const char *dir_name) {
 
 // find a file in given dir
 void cmd::do_find(const char *dir_name, const char *file_name) {
-    string target_dir = dir_name == nullptr ? "./" : dir_name;
-    target_dir += "/";
+    string target_dir = dir_name == nullptr ? get_cur_path() : dir_name;
+    target_dir += target_dir.at(target_dir.length() - 1) != '/' ? "/" : "";
     string target_file = file_name;
 
     queue<string> dir_list;
@@ -186,7 +186,7 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
         string cur_dir = dir_list.front();
         dir_list.pop();
 
-        vector<pair<string, int>> files = do_ls(target_dir.c_str());
+        vector<pair<string, int>> files = do_ls(cur_dir.c_str());
         for (const auto &item : files) {
             if (item.first == target_file) {
                 string full_name;
