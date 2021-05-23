@@ -45,6 +45,9 @@ cmd::cmd() {
     this->status = 1;
 }
 
+/**
+ *
+ */
 void cmd::cmd_loop() {
     string line;
     do {
@@ -102,7 +105,10 @@ void cmd::cmd_loop() {
     } while (this->status);
 }
 
-// when the command is not a built in command
+/**
+ * when the command is not a built in command.
+ * @param command
+ */
 void cmd::do_default(char *const *command) {
     int pid = fork();
     if (pid == 0) {
@@ -118,7 +124,10 @@ void cmd::do_default(char *const *command) {
     }
 }
 
-// change dir to path
+/**
+ * change dir to path.
+ * @param path
+ */
 void cmd::do_cd(const char *path) {
     // get current path
     char cur_path[80];
@@ -147,7 +156,10 @@ void cmd::do_cd(const char *path) {
     this->prompt += cur_path;
 }
 
-// show files in dir_name
+/**
+ * show files in dir_name.
+ * @param dir_name
+ */
 void cmd::do_ls(const char *dir_name) {
     vector<pair<string, int>> files = find_files(dir_name);
     for (const auto &item : files) {
@@ -156,7 +168,11 @@ void cmd::do_ls(const char *dir_name) {
     cout << endl;
 }
 
-// find a file in given dir
+/**
+ * find a file in given dir.
+ * @param dir_name
+ * @param file_name
+ */
 void cmd::do_find(const char *dir_name, const char *file_name) {
     string target_dir = dir_name == nullptr ? get_cur_path() : dir_name;
     target_dir += target_dir.at(target_dir.length() - 1) != '/' ? "/" : "";
@@ -185,9 +201,11 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
     }
 }
 
-// filter the input by pattern
-// parm: type: normal string(-n); regex pattern(-r)
-// parm: pattern: used to compare
+/**
+ * filter the input by pattern.
+ * @param type normal string(-n); regex pattern(-r)
+ * @param pattern used to compare
+ */
 void cmd::do_grep(const char *type, const char *pattern) {
     string mode = type;
     string line;
@@ -211,23 +229,35 @@ void cmd::do_grep(const char *type, const char *pattern) {
     }
 }
 
-// show something about built in commands
+/**
+ * show something about built in commands.
+ */
 void cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
         cout << this->builtin_commands[i] << endl;
     }
 }
 
-// exit shell
+/**
+ * exit shell.
+ */
 void cmd::do_exit() {
     exit(0);
 }
 
+/**
+ * check the status of cmd.
+ * @return
+ */
 int cmd::checkStatus() {
     return (int) this->prompt.size();
 }
 
-// when input contains a "|"
+/**
+ * when input contains a "|".
+ * @param command
+ * @param position
+ */
 void cmd::pipe_handler(char *const *command, int position) {
     char *command_1[20];
     int index_1 = 0;
@@ -276,6 +306,10 @@ void cmd::pipe_handler(char *const *command, int position) {
 
 }
 
+/**
+ * when end with "?".
+ * @param command
+ */
 void cmd::question_handler(const char *command) {
 
 }
