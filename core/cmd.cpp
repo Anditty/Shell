@@ -187,9 +187,23 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
 // parm: type: normal string(-n); regex pattern(-r)
 // parm: pattern: used to compare
 void cmd::do_grep(const char *type, const char *pattern) {
+    string mode = type;
     string line;
-    while (cin >> line){
-        if (line.find(pattern) != string::npos){
+    bool match;
+    while (true) {
+        line = read_line();
+        if (line.empty()) {
+            break;
+        }
+
+        if (mode == "-n") {
+            match = line.find(pattern) != string::npos;
+        } else if (mode == "-r") {
+            std::regex reg(pattern);
+            match = std::regex_match(line, reg);
+        }
+
+        if (match) {
             cout << line << endl;
         }
     }

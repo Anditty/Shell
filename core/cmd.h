@@ -12,6 +12,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <dirent.h>
+#include <regex>
 
 #include "vector"
 #include "queue"
