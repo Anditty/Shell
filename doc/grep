@@ -1,0 +1,3 @@
+grep [-n/-r] [pattern]
+-n means using normal string match
+-r means using regex

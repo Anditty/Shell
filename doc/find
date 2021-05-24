@@ -1,0 +1,2 @@
+find [opt: target directory] [target file name]
+it will find target file in target directory

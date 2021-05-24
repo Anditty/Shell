@@ -216,11 +216,11 @@ void cmd::do_grep(const char *type, const char *pattern) {
             break;
         }
 
-        if (mode == "-n") {
-            match = line.find(pattern) != string::npos;
-        } else if (mode == "-r") {
+        if (mode == "-r") {
             regex reg(pattern);
             match = regex_match(line, reg);
+        } else {
+            match = line.find(pattern) != string::npos;
         }
 
         if (match) {
@@ -311,7 +311,16 @@ void cmd::pipe_handler(char *const *command, int position) {
  * @param command
  */
 void cmd::question_handler(const char *command) {
-
+    char buffer[256];
+    string file_name = command;
+    ifstream in("doc/"+file_name);
+    if (! in.is_open())
+    { cout << "Error opening file"; exit (1); }
+    while (!in.eof() )
+    {
+        in.getline (buffer,100);
+        cout << buffer << endl;
+    }
 }
 
 

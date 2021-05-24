@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <regex>
+#include <fstream>
+#include <cstdlib>
 
 #include "vector"
 #include "queue"
@@ -50,7 +52,7 @@ public:
     // handler
 
     static void pipe_handler(char * const*command, int position);
-    void question_handler(const char *command);
+    static void question_handler(const char *command);
 
     // check shell status
 
