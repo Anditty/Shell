@@ -67,9 +67,9 @@ void cmd::cmd_loop() {
         if (find_pipe(command) != -1) {
             // handle pipe
             pipe_handler(command, find_pipe(command));
-        } else if (find_question(command) == 1){
+        } else if (find_question(command) == 1) {
             question_handler(command[0]);
-        } else{
+        } else {
             // normal condition
             if (this->builtin_map.count(command[0])) {
                 switch (this->builtin_map[command[0]]) {
@@ -313,13 +313,14 @@ void cmd::pipe_handler(char *const *command, int position) {
 void cmd::question_handler(const char *command) {
     char buffer[256];
     string file_name = command;
-    ifstream in("doc/"+file_name);
-    if (! in.is_open())
-    { cout << "Error opening file"; exit (1); }
-    while (!in.eof() )
-    {
-        in.getline (buffer,100);
-        cout << buffer << endl;
+    ifstream in("doc/" + file_name);
+    if (!in.is_open()) {
+        cout << "command not exist" << endl;
+    } else {
+        while (!in.eof()) {
+            in.getline(buffer, 100);
+            cout << buffer << endl;
+        }
     }
 }
 
