@@ -33,6 +33,7 @@ class cmd
 public:
     cmd();
     void cmd_loop();
+    void cmd_select(char **command);
 
     // default
 
@@ -65,4 +66,6 @@ private:
     string hostname;
     string* builtin_commands;
     map<string , int>builtin_map;
+
+    void cmd_select(char *const *command);
 };

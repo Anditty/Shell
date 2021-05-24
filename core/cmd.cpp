@@ -25,13 +25,13 @@ cmd::cmd() {
 
     // get some system information
     struct passwd *pw = getpwuid(getuid());
-    char cur_hostname[32];
-    gethostname(cur_hostname, 32);
+    char cur_hostname[64];
+    gethostname(cur_hostname, 64);
 
     // set home path
     this->home = pw->pw_dir;
     this->user = pw->pw_name;
-    this->hostname = cur_hostname;
+    this->hostname = (string)(cur_hostname);
 
     // set prompt
     char cur_path[80];
@@ -64,45 +64,48 @@ void cmd::cmd_loop() {
         }
 
         char **command = split_command(line);
-        if (find_pipe(command) != -1) {
-            // handle pipe
-            pipe_handler(command, find_pipe(command));
-        } else if (find_question(command) == 1) {
-            question_handler(command[0]);
-        } else {
-            // normal condition
-            if (this->builtin_map.count(command[0])) {
-                switch (this->builtin_map[command[0]]) {
-                    case 0:
-                        do_cd(command[1]);
-                        break;
-                    case 1:
-                        do_find(command[2] == nullptr ? nullptr : command[1],
-                                command[2] == nullptr ? command[1] : command[2]);
-                        break;
-                    case 2:
-                        do_grep(command[1], command[2]);
-                        break;
-                    case 3:
-                        do_help();
-                        break;
-                    case 4:
-                        do_exit();
-                        break;
-                    case 5:
-                        do_ls(command[1]);
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                do_default(command);
-            }
-        }
-
+        cmd_select(command);
 
         this->status = checkStatus();
     } while (this->status);
+}
+
+void cmd::cmd_select(char **command) {
+    if (find_pipe(command) != -1) {
+        // handle pipe
+        pipe_handler(command, find_pipe(command));
+    } else if (find_question(command) == 1) {
+        question_handler(command[0]);
+    } else {
+        // normal condition
+        if (builtin_map.count(command[0])) {
+            switch (builtin_map[command[0]]) {
+                case 0:
+                    do_cd(command[1]);
+                    break;
+                case 1:
+                    do_find(command[2] == nullptr ? nullptr : command[1],
+                            command[2] == nullptr ? command[1] : command[2]);
+                    break;
+                case 2:
+                    do_grep(command[1], command[2]);
+                    break;
+                case 3:
+                    do_help();
+                    break;
+                case 4:
+                    do_exit();
+                    break;
+                case 5:
+                    do_ls(command[1]);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            do_default(command);
+        }
+    }
 }
 
 /**
