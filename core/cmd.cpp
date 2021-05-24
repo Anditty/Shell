@@ -1,5 +1,3 @@
-
-
 #include "cmd.h"
 
 using namespace std;
@@ -52,7 +50,7 @@ void cmd::cmd_loop() {
     string line;
     do {
         cout << this->prompt << "> ";
-        line = read_line();
+        line = input_tab();
         trim(line);
 
 

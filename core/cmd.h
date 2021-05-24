@@ -25,6 +25,8 @@
 #include "../tools/check/check.h"
 #include "../tools/trim/trim.h"
 #include "../tools/path/path.h"
+#include "../tools/input/tab.h"
+
 
 using namespace std;
 
