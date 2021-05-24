@@ -52,7 +52,7 @@ public:
     // handler
 
     static void pipe_handler(char * const*command, int position);
-    static void question_handler(const char *command);
+    void question_handler(const char *command);
 
     // check shell status
 

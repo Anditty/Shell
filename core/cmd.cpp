@@ -316,6 +316,23 @@ void cmd::question_handler(const char *command) {
     ifstream in("doc/" + file_name);
     if (!in.is_open()) {
         cout << "command not exist" << endl;
+
+        string word1 = command;
+        int min_dist = 3;
+        string most_similar;
+        for (int i = 0; i < this->builtin_map.size(); ++i) {
+            if (command[0] == this->builtin_commands[i].at(0)){
+                int tmp_dist = min_modify_dist(word1, this->builtin_commands[i]);
+                if (tmp_dist <= min_dist){
+                    most_similar = this->builtin_commands[i];
+                    min_dist = tmp_dist;
+                }
+            }
+        }
+
+        if (most_similar.length() != 0){
+            printf("Do you mean command <%s>\n", most_similar.c_str());
+        }
     } else {
         while (!in.eof()) {
             in.getline(buffer, 100);

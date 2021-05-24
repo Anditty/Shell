@@ -3,6 +3,7 @@
 //
 #include <sys/stat.h>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -16,8 +17,8 @@ int check_file_stat(char *file_name);
 
 /**
  *
- * @param match the input string
- * @param pattern the string need to be matched
- * @return
+ * @param word1
+ * @param word2
+ * @return the min step change word 1 to word 2
  */
-int fuzzy_match(string match, string pattern);
+int min_modify_dist(string word1, string word2);
