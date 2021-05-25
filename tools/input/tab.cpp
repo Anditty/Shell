@@ -28,13 +28,16 @@ char *get_attach(const char *stacks_, const char *needle_) {
     return pri_string;
 }
 
-string input_tab(string *builtin_commands, int commands_size) {
-    if (!set_flag){
-        for (int i = 0; i < commands_size; ++i) {
-            store_compare[i] = builtin_commands[i].c_str();
-        }
-        set_flag = true;
-    }
+void init_tab(){
+    store_compare[0] = "cd";
+    store_compare[1] = "exit";
+    store_compare[2] = "find";
+    store_compare[3] = "grep";
+    store_compare[4] = "help";
+    store_compare[5] = "ls";
+}
+
+string input_tab() {
     string tab;
     string line;
     int index = 0;

@@ -18,7 +18,9 @@ char scanKeyboard();
 
 char *get_attach(const char *stacks_, const char *needle_);
 
-string input_tab(string *builtin_commands, int commands_size);
+void init_tab();
+
+string input_tab();
 
 
 

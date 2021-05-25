@@ -6,6 +6,7 @@ cmd::cmd() {
     // set builtin commands
     //数组长度
     int commands_number = 6;
+    init_tab();
     this->builtin_commands = new string[commands_number]{
             "cd",
             "find",
@@ -29,7 +30,7 @@ cmd::cmd() {
     // set home path
     this->home = pw->pw_dir;
     this->user = pw->pw_name;
-    this->hostname = (string) (cur_hostname);
+    this->hostname = (string)(cur_hostname);
 
     // set prompt
     char cur_path[80];
@@ -49,8 +50,9 @@ cmd::cmd() {
 void cmd::cmd_loop() {
     string line;
     do {
-        cout << this->prompt << "> ";
-        line = input_tab(this->builtin_commands, (int )(this->builtin_map).size());
+        cout << this->prompt << " > ";
+
+        line = input_tab();
         trim(line);
 
 
@@ -348,16 +350,16 @@ void cmd::question_handler(const char *command) {
         int min_dist = 3;
         string most_similar;
         for (int i = 0; i < this->builtin_map.size(); ++i) {
-            if (command[0] == this->builtin_commands[i].at(0)) {
+            if (command[0] == this->builtin_commands[i].at(0)){
                 int tmp_dist = min_modify_dist(word1, this->builtin_commands[i]);
-                if (tmp_dist <= min_dist) {
+                if (tmp_dist <= min_dist){
                     most_similar = this->builtin_commands[i];
                     min_dist = tmp_dist;
                 }
             }
         }
 
-        if (most_similar.length() != 0) {
+        if (most_similar.length() != 0){
             printf("Do you mean command <%s>\n", most_similar.c_str());
         }
     } else {
