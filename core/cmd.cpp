@@ -225,7 +225,8 @@ void cmd::do_grep(const char *type, const char *pattern) {
         }
 
         if (match) {
-            cout << line << endl;
+//            cout << line << endl;
+            printf("%s\n", line.c_str());
         }
     }
 }
@@ -235,7 +236,8 @@ void cmd::do_grep(const char *type, const char *pattern) {
  */
 void cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
-        cout << this->builtin_commands[i] << endl;
+//        cout << this->builtin_commands[i] << endl;
+        printf("%s\n", this->builtin_commands[i].c_str());
     }
 }
 
@@ -322,7 +324,7 @@ void cmd::question_handler(const char *command) {
     string file_name = command;
     ifstream in("doc/" + file_name);
     if (!in.is_open()) {
-        cout << "command not exist" << endl;
+        printf("command not exist\n");
 
         string word1 = command;
         int min_dist = 3;
@@ -343,7 +345,8 @@ void cmd::question_handler(const char *command) {
     } else {
         while (!in.eof()) {
             in.getline(buffer, 100);
-            cout << buffer << endl;
+//            cout << buffer << endl;
+            printf("%s\n", buffer);
         }
     }
 }
