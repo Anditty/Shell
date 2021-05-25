@@ -33,9 +33,7 @@ using namespace std;
 class cmd {
 public:
     cmd();
-
     void cmd_loop();
-
     void cmd_select(char **command);
 
     // default
@@ -46,22 +44,15 @@ public:
     // commands
 
     void do_cd(const char *path);
-
     static void do_ls(const char *dir_name);
-
     static void do_find(const char *dir_name, const char *file_name);
-
     static void do_grep(const char *type, const char *pattern);
-
     void do_help();
-
     static void do_exit();
 
 
     // handler
-
-    static void pipe_handler(char *const *command, int position);
-
+    void pipe_handler(char *const *command, int position);
     void question_handler(const char *command);
 
     // check shell status
@@ -76,6 +67,4 @@ private:
     string hostname;
     string *builtin_commands;
     map<string, int> builtin_map;
-
-    void cmd_select(char *const *command);
 };

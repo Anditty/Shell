@@ -164,9 +164,9 @@ void cmd::do_cd(const char *path) {
 void cmd::do_ls(const char *dir_name) {
     vector<pair<string, int>> files = find_files(dir_name);
     for (const auto &item : files) {
-        cout << item.first << " ";
+        printf("%s ", item.first.c_str());
     }
-    cout << endl;
+    printf("\n");
 }
 
 /**
@@ -192,7 +192,7 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
                 string full_name;
                 full_name += cur_dir;
                 full_name += target_file;
-                cout << full_name << endl;
+                printf("%s\n", full_name.c_str());
             }
 
             if (item.second == 4) {
@@ -260,9 +260,11 @@ int cmd::checkStatus() {
  * @param position
  */
 void cmd::pipe_handler(char *const *command, int position) {
-    char *command_1[20];
+    int bufsize = 128;
+
+    char *command_1[bufsize];
     int index_1 = 0;
-    char *command_2[20];
+    char *command_2[bufsize];
     int index_2 = 0;
 
     for (int i = 0; i < position; ++i) {
@@ -287,7 +289,9 @@ void cmd::pipe_handler(char *const *command, int position) {
         close(data_pipe[0]);
         dup2(data_pipe[1], 1); // copy std out to pipe write
         close(data_pipe[1]);
-        execvp(command_1[0], command_1);
+        cmd_select(command_1);
+        exit(0);
+//        execvp(command_1[0], command_1);
     } else {
         int pid_2 = fork();
         if (pid_2 == 0) {
@@ -295,7 +299,9 @@ void cmd::pipe_handler(char *const *command, int position) {
             close(data_pipe[1]);
             dup2(data_pipe[0], 0);// copy std in to pipe read
             close(data_pipe[0]);
-            execvp(command_2[0], command_2);
+            cmd_select(command_2);
+            exit(0);
+//            execvp(command_2[0], command_2);
         } else {
             close(data_pipe[0]);
             close(data_pipe[1]);
