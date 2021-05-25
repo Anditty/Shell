@@ -238,11 +238,11 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
 void cmd::do_grep(const char *type, const char *pattern, const char *file) {
     string mode = type;
     string match_pattern = pattern;
-    string file_name = file;
-    ifstream in(file_name);
+    string file_name = file == nullptr? "" : file;
     string line;
     bool match = false;
 
+    ifstream in(file_name);
     if (!file_name.empty() && !in.is_open()) {
         printf("file not exist\n");
         return;
