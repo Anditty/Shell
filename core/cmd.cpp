@@ -164,9 +164,8 @@ void cmd::do_cd(const char *path) {
 void cmd::do_ls(const char *dir_name) {
     vector<pair<string, int>> files = find_files(dir_name);
     for (const auto &item : files) {
-        printf("%s ", item.first.c_str());
+        printf("%s\n", item.first.c_str());
     }
-    printf("\n");
 }
 
 /**
