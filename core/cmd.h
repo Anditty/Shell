@@ -46,7 +46,7 @@ public:
     void do_cd(const char *path);
     static void do_ls(const char *dir_name);
     static void do_find(const char *dir_name, const char *file_name);
-    static void do_grep(const char *type, const char *pattern);
+    static void do_grep(const char *type, const char *pattern, const char *file);
     void do_help();
     static void do_exit();
 

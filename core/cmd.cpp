@@ -63,8 +63,16 @@ void cmd::cmd_loop() {
             continue;
         }
 
-        char **command = split_command(line);
+        vector<string> array = split_to_vec(line);
+        char **command = new char *[array.size() + 1];
+        for (int i = 0; i < array.size(); ++i) {
+            command[i] = (char *)array[i].c_str();
+        }
+        command[array.size()] = nullptr;
+
         cmd_select(command);
+
+        delete[] command;
 
         this->status = checkStatus();
     } while (this->status);
@@ -107,7 +115,7 @@ void cmd::cmd_select(char **command) {
                         break;
                     }
 
-                    do_grep(command[1], command[2]);
+                    do_grep(command[1], command[2], command[3]);
                     break;
                 case 3:
                     do_help();
@@ -227,21 +235,37 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
  * @param type normal string(-n); regex pattern(-r)
  * @param pattern used to compare
  */
-void cmd::do_grep(const char *type, const char *pattern) {
+void cmd::do_grep(const char *type, const char *pattern, const char *file) {
     string mode = type;
+    string match_pattern = pattern;
+    string file_name = file;
+    ifstream in(file_name);
     string line;
-    bool match;
+    bool match = false;
+
+    if (!file_name.empty() && !in.is_open()) {
+        printf("file not exist\n");
+        return;
+    }
+
     while (true) {
-        line = read_line();
+        if (!file_name.empty()){
+            char buffer[1024];
+            in.getline(buffer, 1024);
+            line = buffer;
+        } else{
+            line = read_line();
+        }
+
         if (line.empty()) {
             break;
         }
 
         if (mode == "-r") {
-            regex reg(pattern);
+            regex reg(match_pattern);
             match = regex_match(line, reg);
         } else {
-            match = line.find(pattern) != string::npos;
+            match = line.find(match_pattern) != string::npos;
         }
 
         if (match) {

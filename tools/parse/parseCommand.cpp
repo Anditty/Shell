@@ -3,16 +3,23 @@
 //
 #include "parseCommand.h"
 
-char **split_command(const string &command) {
+vector<string> split_to_vec(const string &command){
     vector<string> array;
     stringstream ss(command);
     string temp;
 
     while (ss >> temp)
-        array.push_back(temp);
+        array.emplace_back(temp);
+
+    return array;
+}
+
+char **split_command(const string &command) {
+    vector<string> array = split_to_vec(command);
+
     char **args = new char *[array.size() + 1];
     for (int i = 0; i < array.size(); ++i) {
-        args[i] = (char *) array.at(i).c_str();
+        args[i] = (char *) array[i].c_str();
     }
     args[array.size()] = nullptr;
 
