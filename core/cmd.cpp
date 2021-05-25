@@ -5,7 +5,7 @@ using namespace std;
 cmd::cmd() {
     // set builtin commands
     //数组长度
-    int commands_number = 6;
+    int commands_number = 7;
     init_tab();
     this->builtin_commands = new string[commands_number]{
             "cd",
@@ -13,7 +13,8 @@ cmd::cmd() {
             "grep",
             "help",
             "exit",
-            "ls"
+            "ls",
+            "if"
     };
 
 
@@ -125,6 +126,9 @@ void cmd::cmd_select(char **command) {
                     break;
                 case 5:
                     do_ls(command[1]);
+                    break;
+                case 6:
+                    do_if(command);
                     break;
                 default:
                     break;
@@ -394,6 +398,92 @@ void cmd::question_handler(const char *command) {
         }
     }
 }
+
+enum states {NEUTRAL,WANT_THEN,THEN_BLOCK,ELSE_BLOCK};
+enum results {SUCCESS,FAIL};
+static int if_state = NEUTRAL;
+static int if_result = SUCCESS;
+
+int cmd::is_control_command(const char *cmd){
+    return (strcmp(cmd,"if")==0||strcmp(cmd,"then")==0||strcmp(cmd,"fi")==0||strcmp(cmd,"else")==0);
+}
+
+int cmd::do_if(char *const *args){
+    int last_stat=0;
+    const char *command = args[0];
+    int rv = -1;
+    if(strcmp(command, "if") == 0){
+        if(if_state != NEUTRAL)
+            perror("if_state error1");
+        else{
+            last_stat = process(args + 1);//执行if后的命令
+            if_result = (last_stat == 0 ? SUCCESS:FAIL);
+            if_state = WANT_THEN;
+            rv = 0;
+        }
+    }
+    else if(strcmp(command, "then") == 0){
+        if(if_state != WANT_THEN)
+            perror("if_state error2");
+        if_state = THEN_BLOCK;
+        if(ok_to_execute())
+            process(args + 1);
+        rv = 0;
+    }
+    else if(strcmp(command, "else") == 0){
+        if(if_state != THEN_BLOCK)
+            perror("if_state error3");
+        if_state = ELSE_BLOCK;
+        if(ok_to_execute())
+            process(args + 1);
+        rv = 0;
+    }
+    else if(strcmp(command, "fi") == 0){
+        if(if_state!=ELSE_BLOCK)
+            perror("if_state error4");
+        else{
+            if_state = NEUTRAL;
+            rv = 0;
+        }
+    }
+    return rv;
+}
+
+int cmd::ok_to_execute(){
+    int rv = 1;
+    if(if_state == WANT_THEN){
+        perror("if_state error5");
+        rv = 0;
+    }
+    else if(if_state == THEN_BLOCK && if_result == FAIL) {
+        rv = 0;
+        perror("if_state error6");
+    }
+    else if(if_state == ELSE_BLOCK && if_result == SUCCESS) {
+        rv = 0;
+        perror("if_state error7");
+    }
+    return rv;
+}
+
+int cmd::process(char *const *arglist){
+    int rv = 0;
+    if(arglist[0] == NULL)
+        return rv;
+    if(is_control_command(arglist[0]))
+        rv = do_if(arglist);
+    else if(ok_to_execute()) {
+        cmd_select(const_cast<char **>(arglist));
+        arglist++;
+        if(is_control_command(arglist[0])){
+            do_if(arglist);
+        }
+        rv=1;
+    }
+    return rv;
+}
+
+
 
 
 

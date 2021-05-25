@@ -49,6 +49,8 @@ public:
     static void do_grep(const char *type, const char *pattern, const char *file);
     void do_help();
     static void do_exit();
+    int do_if(char *const *args);
+
 
 
     // handler
@@ -56,8 +58,10 @@ public:
     void question_handler(const char *command);
 
     // check shell status
-
+    int is_control_command(const char *cmd);
     int checkStatus();
+    int ok_to_execute();
+    int process(char *const *arglist);
 
 private:
     int status;

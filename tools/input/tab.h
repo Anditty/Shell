@@ -16,7 +16,7 @@ static bool set_flag = false;
 
 char scanKeyboard();
 
-char *get_attach(const char *stacks_, const char *needle_);
+bool get_attach(const char *stacks_, const char *needle_);
 
 void init_tab();
 

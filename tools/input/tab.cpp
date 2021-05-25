@@ -21,11 +21,17 @@ char scanKeyboard() {
 }
 //测试函数
 
-char *get_attach(const char *stacks_, const char *needle_) {
-    char *pri_string_stack = (char *) stacks_;
-    char *pri_string_needle = (char *) needle_;
-    char *pri_string = strstr(pri_string_stack, pri_string_needle);
-    return pri_string;
+bool get_attach(const char *stacks_, const char *needle_) {
+//    char *pri_string_stack = (char *) stacks_;
+//    char *pri_string_needle = (char *) needle_;
+//    char *pri_string = strstr(pri_string_stack, pri_string_needle);
+    int len=strlen(needle_);
+    string a=stacks_;
+    string b=needle_;
+    if(a.substr(0, len)==(b.substr(0,len))){
+        return true;
+    } else return false;
+
 }
 
 void init_tab(){
@@ -35,6 +41,8 @@ void init_tab(){
     store_compare[3] = "grep";
     store_compare[4] = "help";
     store_compare[5] = "ls";
+    store_compare[6] = "if";
+    store_compare[7] = "then";
 }
 
 string input_tab() {
@@ -45,11 +53,19 @@ string input_tab() {
     while (true) {
         //每次监控一个字符
         char tmp = scanKeyboard();
-//        cout<<(int) tmp;
+ //       cout<<(int) tmp;
 
         if (tmp == 10) {
             return line;
-        } else if (tmp == 9) {
+        }
+        else if (tmp==32){
+            tab = "";
+            index = 0;
+            tab += tmp;
+            index++;
+            line += tmp;
+        }
+        else if (tmp == 9) {
             cout << "\n> " << line;
             bool f = false;
             if (tab.empty()) continue;
