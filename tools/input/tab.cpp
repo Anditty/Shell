@@ -4,7 +4,6 @@
 
 #include "tab.h"
 
-
 char scanKeyboard() {
     char in;
     struct termios new_settings;
@@ -29,16 +28,18 @@ char *get_attach(const char *stacks_, const char *needle_) {
     return pri_string;
 }
 
-string input_tab() {
-    store_compare[0] = "ls";
-    store_compare[1] = "help";
-    store_compare[2] = "build";
-    store_compare[3] = "compile";
+string input_tab(string *builtin_commands, int commands_size) {
+    if (!set_flag){
+        for (int i = 0; i < commands_size; ++i) {
+            store_compare[i] = builtin_commands[i].c_str();
+        }
+        set_flag = true;
+    }
     string tab;
     string line;
     int index = 0;
 
-    while (1) {
+    while (true) {
         //每次监控一个字符
         char tmp = scanKeyboard();
 //        cout<<(int) tmp;
@@ -48,7 +49,7 @@ string input_tab() {
         } else if (tmp == 9) {
             cout << "\n> " << line;
             bool f = false;
-            if (tab == "") continue;
+            if (tab.empty()) continue;
             int len = tab.length();
             trim(tab);
             int dif = len - tab.length();

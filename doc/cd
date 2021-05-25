@@ -1,2 +1,2 @@
-ls [the full name of target path]
+cd [the full name of target path]
 change current working directory

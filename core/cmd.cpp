@@ -50,7 +50,7 @@ void cmd::cmd_loop() {
     string line;
     do {
         cout << this->prompt << "> ";
-        line = input_tab();
+        line = input_tab(this->builtin_commands, (int )(this->builtin_map).size());
         trim(line);
 
 
@@ -75,17 +75,36 @@ void cmd::cmd_select(char **command) {
     } else if (find_question(command) == 1) {
         question_handler(command[0]);
     } else {
+        int min_args;
         // normal condition
         if (builtin_map.count(command[0])) {
             switch (builtin_map[command[0]]) {
                 case 0:
+                    min_args = 1;
+                    if (command[min_args] == nullptr){
+                        question_handler(command[0]);
+                        break;
+                    }
+
                     do_cd(command[1]);
                     break;
                 case 1:
+                    min_args = 1;
+                    if (command[min_args] == nullptr){
+                        question_handler(command[0]);
+                        break;
+                    }
+
                     do_find(command[2] == nullptr ? nullptr : command[1],
                             command[2] == nullptr ? command[1] : command[2]);
                     break;
                 case 2:
+                    min_args = 2;
+                    if (command[min_args] == nullptr){
+                        question_handler(command[0]);
+                        break;
+                    }
+
                     do_grep(command[1], command[2]);
                     break;
                 case 3:
