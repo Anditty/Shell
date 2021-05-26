@@ -33,14 +33,6 @@ cmd::cmd() {
     this->user = pw->pw_name;
     this->hostname = (string)(cur_hostname);
 
-    // set prompt
-    char cur_path[80];
-    getcwd(cur_path, sizeof(cur_path));
-    this->prompt += (string) pw->pw_name;
-    this->prompt += "@";
-    this->prompt += this->hostname + " ";
-    this->prompt += cur_path;
-
     //set status
     this->status = 1;
 }
@@ -51,11 +43,11 @@ cmd::cmd() {
 void cmd::cmd_loop() {
     string line;
     do {
-        cout << this->prompt << " > ";
+        update_prompt();
+        cout << this->prompt;
 
-        line = input_tab();
+        line = input_tab(this->prompt);
         trim(line);
-
 
         // need to deal with space " "
         //...
@@ -181,13 +173,6 @@ void cmd::do_cd(const char *path) {
         target += string(path);
         chdir(target.c_str());
     }
-
-    // update prompt
-    getcwd(cur_path, sizeof(cur_path));
-    this->prompt = this->user;
-    this->prompt += "@";
-    this->prompt += this->hostname + " ";
-    this->prompt += cur_path;
 }
 
 /**
@@ -478,7 +463,7 @@ int cmd::ok_to_execute(){
 
 int cmd::process(char *const *arglist){
     int rv = 0;
-    if(arglist[0] == NULL)
+    if(arglist[0] == nullptr)
         return rv;
     if(is_control_command(arglist[0]))
         rv = do_if(arglist);
@@ -487,6 +472,18 @@ int cmd::process(char *const *arglist){
         rv=0;
     }
     return rv;
+}
+
+void cmd::update_prompt() {
+    this->prompt = "";
+    struct passwd *pw = getpwuid(getuid());
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+    this->prompt += (string) pw->pw_name;
+    this->prompt += "@";
+    this->prompt += this->hostname + " ";
+    this->prompt += cur_path;
+    this->prompt += " > ";
 }
 
 

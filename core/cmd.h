@@ -35,6 +35,7 @@ public:
     cmd();
     void cmd_loop();
     void cmd_select(char **command);
+    void update_prompt();
 
     // default
 
