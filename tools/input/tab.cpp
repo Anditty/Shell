@@ -94,11 +94,17 @@ string input_tab() {
                 index=0;
             }else{
                 line = line.substr(0, line.length() - 1);
+                if(line==""){
+                    tab = "";
+                    index=0;
+                }
                 vector<string> tmp_str = split(line, " ");
 
                 if (tmp_str.size() != 0) {
+
                     tab = tmp_str[tmp_str.size() - 1];
                     index = tab.length();
+                    //cout<<tab;
                 }
             }
             //cout << endl << "line--->" << line;
