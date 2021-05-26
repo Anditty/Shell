@@ -77,7 +77,11 @@ string input_tab(const string& prompt) {
 
         if (tmp == 10) {
             return line;
-        } else if (tmp == 127) {
+        } else if(tmp==48){
+            cout<<endl<<"tab---->"<<tab;
+            cout<<endl<<"line---->"<<line;
+        }
+        else if (tmp == 127) {
             if (loc <= 0) {
                 printf("\x1b[%dD", 2);
                 printf("\x1b[K");
@@ -149,10 +153,17 @@ string input_tab(const string& prompt) {
             index = 0;
         } else {
             loc++;
-            tab += tmp;
+            //tab += tmp;
             tab_space += tmp;
-            index++;
+            //index++;
             line += tmp;
+            vector<string> tmp_str = split(line, " ");
+            if (tmp_str.size() != 0) {
+
+                tab = tmp_str[tmp_str.size() - 1];
+                index = tab.length();
+                //cout<<tab;
+            }
         }
     }
 }
