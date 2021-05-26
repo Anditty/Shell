@@ -11,7 +11,7 @@ add_executable(Shell
         core/cmd.h
         tools/input/read.cpp
         tools/input/read.h
-        main.cpp tools/parse/parseCommand.cpp tools/parse/parseCommand.h tools/check/check.cpp tools/check/check.h tools/trim/trim.cpp tools/trim/trim.h tools/path/path.cpp tools/path/path.h tools/input/tab.cpp tools/input/tab.h tools/parse/parseScript.cpp tools/parse/parseScript.h)
+        main.cpp tools/parse/parseCommand.cpp tools/parse/parseCommand.h tools/check/check.cpp tools/check/check.h tools/trim/trim.cpp tools/trim/trim.h tools/path/path.cpp tools/path/path.h tools/input/tab.cpp tools/input/tab.h tools/parse/parseScript.cpp tools/parse/parseScript.h tools/copy_array/copy_array.cpp tools/copy_array/copy_array.h)
 add_executable(Test test.cpp
         tools/input/read.cpp
         tools/input/read.h
