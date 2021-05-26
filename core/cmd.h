@@ -21,6 +21,7 @@
 #include "map"
 
 #include "../tools/parse/parseCommand.h"
+#include "../tools/parse/parseScript.h"
 #include "../tools/input/read.h"
 #include "../tools/check/check.h"
 #include "../tools/trim/trim.h"
