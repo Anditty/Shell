@@ -437,7 +437,7 @@ int cmd::is_control_command(const char *cmd){
 }
 
 int cmd::do_if(char *const *args){
-    int last_stat=0;
+    int last_stat;
     const char *command = args[0];
     int rv = -1;
     if(strcmp(command, "if") == 0){
@@ -479,6 +479,8 @@ int cmd::do_if(char *const *args){
             if_state = NEUTRAL;
             rv = 0;
         }
+        return rv;
+
     }
         args+=2;
         if(args[0]!= nullptr&&is_control_command(args[0])){
@@ -495,11 +497,9 @@ int cmd::ok_to_execute(){
     }
     else if(if_state == THEN_BLOCK && if_result == FAIL) {
         rv = 0;
-        perror("if_state error6");
     }
     else if(if_state == ELSE_BLOCK && if_result == SUCCESS) {
         rv = 0;
-        perror("if_state error7");
     }
     return rv;
 }
@@ -511,8 +511,7 @@ int cmd::process(char *const *arglist){
     if(is_control_command(arglist[0]))
         rv = do_if(arglist);
     else if(ok_to_execute()) {
-        cmd_select(const_cast<char **>(arglist));
-        rv=0;
+        rv=cmd_select(const_cast<char **>(arglist));
     }
     return rv;
 }
