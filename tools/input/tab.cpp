@@ -60,6 +60,7 @@ void init_tab() {
     store_compare[5] = "ls";
     store_compare[6] = "if";
     store_compare[7] = "then";
+    store_compare[8] = "sed";
 }
 
 string input_tab(const string& prompt) {

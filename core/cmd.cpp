@@ -5,7 +5,7 @@ using namespace std;
 cmd::cmd() {
     // set builtin commands
     //数组长度
-    int commands_number = 7;
+    int commands_number = 8;
     init_tab();
     this->builtin_commands = new string[commands_number]{
             "cd",
@@ -14,7 +14,8 @@ cmd::cmd() {
             "help",
             "exit",
             "ls",
-            "if"
+            "if",
+            "sed"
     };
 
 
@@ -526,6 +527,28 @@ void cmd::update_prompt() {
     this->prompt += this->hostname + " ";
     this->prompt += cur_path;
     this->prompt += " > ";
+}
+
+int cmd::do_sed(const char *script, const char *file_name) {
+    ifstream in;
+    char line[1024]={'\0'};
+    in.open(file_name);
+    int i=0;
+    string tempStr;
+    while(in.getline(line,sizeof(line)))
+    {
+        i++;
+
+        tempStr+='\n';
+    }
+    in.close();
+    ofstream out;
+    out.open(file_name);
+    out.flush();
+    out<<tempStr;
+    out.close();
+
+    return 0;
 }
 
 
