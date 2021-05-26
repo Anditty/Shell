@@ -95,11 +95,17 @@ string input_tab(const string& prompt) {
                 index=0;
             }else{
                 line = line.substr(0, line.length() - 1);
+                if(line==""){
+                    tab = "";
+                    index=0;
+                }
                 vector<string> tmp_str = split(line, " ");
 
                 if (tmp_str.size() != 0) {
+
                     tab = tmp_str[tmp_str.size() - 1];
                     index = tab.length();
+                    //cout<<tab;
                 }
             }
             //cout << endl << "line--->" << line;
@@ -115,7 +121,7 @@ string input_tab(const string& prompt) {
             //cout<<endl<<"tab----->"<<tab;
             //cout << "\n> " << line;
             //sleep(1);
-            printf("\x1b[%dD", 8 - (line.length() + 2) % 8);
+            printf("\x1b[%dD", 8 - (line.length() + prompt.length()) % 8);
             printf("\x1b[K");
             printf("\x1b[u");
 
