@@ -51,6 +51,7 @@ public:
     int do_help();
     static int do_exit();
     int do_if(char *const *args);
+    static int do_sed(const char *script, const char *file_name);
 
 
 
