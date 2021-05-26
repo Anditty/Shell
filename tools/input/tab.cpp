@@ -120,7 +120,7 @@ string input_tab(const string& prompt) {
             //cout<<endl<<"tab----->"<<tab;
             //cout << "\n> " << line;
             //sleep(1);
-            printf("\x1b[%dD", 8 - (line.length() + 2) % 8);
+            printf("\x1b[%dD", 8 - (line.length() + prompt.length()) % 8);
             printf("\x1b[K");
             printf("\x1b[u");
 
