@@ -18,6 +18,7 @@ vector<pair<string, int>> find_files(const char *dir_name) {
 
     if ((dir = opendir(ls_dir.c_str())) == nullptr) {
         perror("Open dir error...");
+        files.emplace_back("error", -1);
         return files;
     }
 
