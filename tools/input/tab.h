@@ -22,5 +22,6 @@ void init_tab();
 
 string input_tab();
 
+vector<string> split(const string& s, const string& delim);
 
 

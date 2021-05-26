@@ -420,6 +420,11 @@ int cmd::do_if(char *const *args){
             if_result = (last_stat == 0 ? SUCCESS:FAIL);
             if_state = WANT_THEN;
             rv = 0;
+            if(if_result==SUCCESS) {
+                printf("\x1b[;%dm%s\x1b[%dm", 32, "IF CONDITION EXECUTE SUCCESS!\n", 0);
+            } else{
+                printf("\x1b[;%dm%s\x1b[%dm", 31, "IF CONDITION EXECUTE FAILED!\n", 0);
+            }
         }
     }
     else if(strcmp(command, "then") == 0){
@@ -437,6 +442,7 @@ int cmd::do_if(char *const *args){
         if(ok_to_execute())
             process(args + 1);
         rv = 0;
+
     }
     else if(strcmp(command, "fi") == 0){
         if(if_state!=ELSE_BLOCK)
@@ -446,6 +452,10 @@ int cmd::do_if(char *const *args){
             rv = 0;
         }
     }
+        args+=2;
+        if(args[0]!= nullptr&&is_control_command(args[0])){
+            do_if(args);
+        }
     return rv;
 }
 
@@ -474,11 +484,7 @@ int cmd::process(char *const *arglist){
         rv = do_if(arglist);
     else if(ok_to_execute()) {
         cmd_select(const_cast<char **>(arglist));
-        arglist++;
-        if(is_control_command(arglist[0])){
-            do_if(arglist);
-        }
-        rv=1;
+        rv=0;
     }
     return rv;
 }
