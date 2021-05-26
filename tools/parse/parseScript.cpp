@@ -4,10 +4,9 @@
 
 #include "parseScript.h"
 
-vector<string> split_script(char *script, const string& c) {
+vector<string> split_script(const string& s, const string& c) {
     vector<string> scripts;
     size_t pos1, pos2;
-    string s = script;
     pos1 = 0;
     pos2 = s.find(c);
 
@@ -28,9 +27,14 @@ vector<string> split_script(char *script, const string& c) {
 vector<pair<string, int>> parse_sed_script(char *script){
     vector<pair<string, int>> result;
 
-    vector<string> scripts = split_script(script, "/");
+    vector<string> scripts = split_script(script, string("/"));
     if (scripts.size() == 4){
-
+        for (int i = 0; i < 4; ++i) {
+            vector<string> tmp = split_script(scripts[i], ",");
+            for (const auto &item : tmp){
+                result.emplace_back(item, i);
+            }
+        }
     }
 
     return result;
