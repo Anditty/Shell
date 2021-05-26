@@ -20,7 +20,7 @@ bool get_attach(const char *stacks_, const char *needle_);
 
 void init_tab();
 
-string input_tab();
+string input_tab(const string& prompt);
 
 vector<string> split(const string& s, const string& delim);
 

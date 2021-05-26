@@ -62,7 +62,7 @@ void init_tab() {
     store_compare[7] = "then";
 }
 
-string input_tab() {
+string input_tab(const string& prompt) {
     string tab;
     string line;
     string tab_space;

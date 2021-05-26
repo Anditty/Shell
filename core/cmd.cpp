@@ -33,14 +33,6 @@ cmd::cmd() {
     this->user = pw->pw_name;
     this->hostname = (string)(cur_hostname);
 
-    // set prompt
-    char cur_path[80];
-    getcwd(cur_path, sizeof(cur_path));
-    this->prompt += (string) pw->pw_name;
-    this->prompt += "@";
-    this->prompt += this->hostname + " ";
-    this->prompt += cur_path;
-
     //set status
     this->status = 1;
 }
@@ -51,11 +43,11 @@ cmd::cmd() {
 void cmd::cmd_loop() {
     string line;
     do {
-        cout << this->prompt << " > ";
+        update_prompt();
+        cout << this->prompt;
 
-        line = input_tab();
+        line = input_tab(this->prompt);
         trim(line);
-
 
         // need to deal with space " "
         //...
@@ -79,12 +71,14 @@ void cmd::cmd_loop() {
     } while (this->status);
 }
 
-void cmd::cmd_select(char **command) {
+int cmd::cmd_select(char **command) {
+    int execute_result = 0;
+
     if (find_pipe(command) != -1) {
         // handle pipe
-        pipe_handler(command, find_pipe(command));
+        execute_result = pipe_handler(command, find_pipe(command));
     } else if (find_question(command) == 1) {
-        question_handler(command[0]);
+        execute_result = question_handler(command[0]);
     } else {
         int min_args;
         // normal condition
@@ -94,57 +88,67 @@ void cmd::cmd_select(char **command) {
                     min_args = 1;
                     if (command[min_args] == nullptr){
                         question_handler(command[0]);
+                        execute_result = 1;
                         break;
                     }
 
-                    do_cd(command[1]);
+                    execute_result = do_cd(command[1]);
                     break;
                 case 1:
                     min_args = 1;
                     if (command[min_args] == nullptr){
                         question_handler(command[0]);
+                        execute_result = 1;
                         break;
                     }
 
-                    do_find(command[2] == nullptr ? nullptr : command[1],
+                    execute_result = do_find(command[2] == nullptr ? nullptr : command[1],
                             command[2] == nullptr ? command[1] : command[2]);
                     break;
                 case 2:
                     min_args = 2;
                     if (command[min_args] == nullptr){
                         question_handler(command[0]);
+                        execute_result = 1;
                         break;
                     }
 
-                    do_grep(command[1], command[2], command[3]);
+                    execute_result = do_grep(command[1], command[2], command[3]);
                     break;
                 case 3:
-                    do_help();
+                    execute_result = do_help();
                     break;
                 case 4:
-                    do_exit();
+                    execute_result = do_exit();
                     break;
                 case 5:
-                    do_ls(command[1]);
+                    execute_result = do_ls(command[1]);
                     break;
                 case 6:
-                    do_if(command);
+                    execute_result = do_if(command);
                     break;
                 default:
                     break;
             }
         } else {
             do_default(command);
+            execute_result = 0;
         }
     }
+
+    return execute_result;
 }
 
 /**
  * when the command is not a built in command.
  * @param command
  */
-void cmd::do_default(char *const *command) {
+int cmd::do_default(char *const *command) {
     int pid = fork();
+    if (pid == -1){
+        return 1;
+    }
+
     if (pid == 0) {
         // Child process
         int status = 0;
@@ -156,13 +160,15 @@ void cmd::do_default(char *const *command) {
         int child_status;
         waitpid(pid, &child_status, 0);
     }
+
+    return 0;
 }
 
 /**
  * change dir to path.
  * @param path
  */
-void cmd::do_cd(const char *path) {
+int cmd::do_cd(const char *path) {
     // get current path
     char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
@@ -174,31 +180,33 @@ void cmd::do_cd(const char *path) {
     }
 
     // change directory
-    if (chdir(path) != 0) {
+    int execute_result = chdir(path);
+    if (execute_result != 0) {
         // if it is a relative path
         string target = cur_path;
         target += "/";
         target += string(path);
-        chdir(target.c_str());
+        execute_result = chdir(target.c_str());
     }
 
-    // update prompt
-    getcwd(cur_path, sizeof(cur_path));
-    this->prompt = this->user;
-    this->prompt += "@";
-    this->prompt += this->hostname + " ";
-    this->prompt += cur_path;
+    return execute_result;
 }
 
 /**
  * show files in dir_name.
  * @param dir_name
  */
-void cmd::do_ls(const char *dir_name) {
+int cmd::do_ls(const char *dir_name) {
     vector<pair<string, int>> files = find_files(dir_name);
+
+    if (!files.empty() && files[0].second == -1){
+        return 1;
+    }
+
     for (const auto &item : files) {
         printf("%s\n", item.first.c_str());
     }
+    return 0;
 }
 
 /**
@@ -206,7 +214,7 @@ void cmd::do_ls(const char *dir_name) {
  * @param dir_name
  * @param file_name
  */
-void cmd::do_find(const char *dir_name, const char *file_name) {
+int cmd::do_find(const char *dir_name, const char *file_name) {
     string target_dir = dir_name == nullptr ? get_cur_path() : dir_name;
     target_dir += target_dir.at(target_dir.length() - 1) != '/' ? "/" : "";
     string target_file = file_name;
@@ -232,6 +240,8 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
             }
         }
     }
+
+    return 0;
 }
 
 /**
@@ -239,7 +249,7 @@ void cmd::do_find(const char *dir_name, const char *file_name) {
  * @param type normal string(-n); regex pattern(-r)
  * @param pattern used to compare
  */
-void cmd::do_grep(const char *type, const char *pattern, const char *file) {
+int cmd::do_grep(const char *type, const char *pattern, const char *file) {
     string mode = type;
     string match_pattern = pattern;
     string file_name = file == nullptr? "" : file;
@@ -249,7 +259,7 @@ void cmd::do_grep(const char *type, const char *pattern, const char *file) {
     ifstream in(file_name);
     if (!file_name.empty() && !in.is_open()) {
         printf("file not exist\n");
-        return;
+        return 1;
     }
 
     while (true) {
@@ -277,23 +287,27 @@ void cmd::do_grep(const char *type, const char *pattern, const char *file) {
             printf("%s\n", line.c_str());
         }
     }
+
+    return 0;
 }
 
 /**
  * show something about built in commands.
  */
-void cmd::do_help() {
+int cmd::do_help() {
     for (int i = 0; i < this->builtin_map.size(); ++i) {
 //        cout << this->builtin_commands[i] << endl;
         printf("%s\n", this->builtin_commands[i].c_str());
     }
+    return 0;
 }
 
 /**
  * exit shell.
  */
-void cmd::do_exit() {
+int cmd::do_exit() {
     exit(0);
+    return 0;
 }
 
 /**
@@ -309,7 +323,7 @@ int cmd::checkStatus() {
  * @param command
  * @param position
  */
-void cmd::pipe_handler(char *const *command, int position) {
+int cmd::pipe_handler(char *const *command, int position) {
     int bufsize = 128;
 
     char *command_1[bufsize];
@@ -334,6 +348,10 @@ void cmd::pipe_handler(char *const *command, int position) {
     pipe(data_pipe);
 
     int pid_1 = fork();
+    if (pid_1 == -1){
+        return 1;
+    }
+
     if (pid_1 == 0) {
         // child 1
         close(data_pipe[0]);
@@ -344,6 +362,10 @@ void cmd::pipe_handler(char *const *command, int position) {
 //        execvp(command_1[0], command_1);
     } else {
         int pid_2 = fork();
+        if (pid_2 == -1){
+            return 1;
+        }
+
         if (pid_2 == 0) {
             // child 2
             close(data_pipe[1]);
@@ -361,13 +383,14 @@ void cmd::pipe_handler(char *const *command, int position) {
         }
     }
 
+    return 0;
 }
 
 /**
  * when end with "?".
  * @param command
  */
-void cmd::question_handler(const char *command) {
+int cmd::question_handler(const char *command) {
     char buffer[256];
     string file_name = command;
     ifstream in("doc/" + file_name);
@@ -390,12 +413,16 @@ void cmd::question_handler(const char *command) {
         if (most_similar.length() != 0){
             printf("Do you mean command <%s>\n", most_similar.c_str());
         }
+
+        return 1;
     } else {
         while (!in.eof()) {
             in.getline(buffer, 100);
 //            cout << buffer << endl;
             printf("%s\n", buffer);
         }
+
+        return 0;
     }
 }
 
@@ -478,7 +505,7 @@ int cmd::ok_to_execute(){
 
 int cmd::process(char *const *arglist){
     int rv = 0;
-    if(arglist[0] == NULL)
+    if(arglist[0] == nullptr)
         return rv;
     if(is_control_command(arglist[0]))
         rv = do_if(arglist);
@@ -487,6 +514,18 @@ int cmd::process(char *const *arglist){
         rv=0;
     }
     return rv;
+}
+
+void cmd::update_prompt() {
+    this->prompt = "";
+    struct passwd *pw = getpwuid(getuid());
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+    this->prompt += (string) pw->pw_name;
+    this->prompt += "@";
+    this->prompt += this->hostname + " ";
+    this->prompt += cur_path;
+    this->prompt += " > ";
 }
 
 
