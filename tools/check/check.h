@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
 using namespace std;
 
@@ -22,3 +23,5 @@ int check_file_stat(char *file_name);
  * @return the min step change word 1 to word 2
  */
 int min_modify_dist(string word1, string word2);
+
+bool check_is_num(const string&);

@@ -24,13 +24,13 @@ vector<string> split_script(const string& s, const string& c) {
     return scripts;
 }
 
-vector<pair<string, int>> parse_sed_script(char *script){
+vector<pair<string, int>> parse_sed_script(const char *script){
     vector<pair<string, int>> result;
 
     vector<string> scripts = split_script(script, string("/"));
     if (scripts.size() == 4){
         for (int i = 0; i < 4; ++i) {
-            vector<string> tmp = split_script(scripts[i], ",");
+            vector<string> tmp = split_script(scripts[i], ";");
             for (const auto &item : tmp){
                 result.emplace_back(item, i);
             }

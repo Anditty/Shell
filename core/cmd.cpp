@@ -57,7 +57,7 @@ void cmd::cmd_loop() {
             continue;
         }
 
-        vector<string> array = split_to_vec(line);
+        vector<string> array = split(line, " ");
         char **command = new char *[array.size() + 1];
         for (int i = 0; i < array.size(); ++i) {
             command[i] = (char *)array[i].c_str();
@@ -128,6 +128,8 @@ int cmd::cmd_select(char **command) {
                 case 6:
                     execute_result = do_if(command);
                     break;
+                case 7:
+                    execute_result = do_sed(command[1], command[2]);
                 default:
                     break;
             }
@@ -530,25 +532,79 @@ void cmd::update_prompt() {
 }
 
 int cmd::do_sed(const char *script, const char *file_name) {
-    //vector<pair<string, int>> scripts = parse_sed_script(script);
+    vector<pair<string, int>> scripts = parse_sed_script(script);
 
-    //    ifstream in;
-//    char line[1024]={'\0'};
-//    in.open(file_name);
-//    int i=0;
-//    string tempStr;
-//    while(in.getline(line,sizeof(line)))
-//    {
-//        i++;
-//
-//        tempStr+='\n';
-//    }
-//    in.close();
-//    ofstream out;
-//    out.open(file_name);
-//    out.flush();
-//    out<<tempStr;
-//    out.close();
+    int lines[2] = {0, INT32_MAX};
+    int line_index = 0;
+    string pattern = "d";
+    string target;
+    string replacement;
+    string flag = "g";
+
+    for (const auto &item : scripts){
+        if (item.second==0 && line_index < 2){
+            lines[line_index] = stoi(item.first);
+            line_index++;
+            continue;
+        }
+
+        if (item.second == 1){
+            pattern = item.first.substr(0, 1);
+            target = item.first.substr(1);
+            continue;
+        }
+
+        if (item.second == 2){
+            replacement = item.first;
+            continue;
+        }
+
+        if (item.second == 3){
+            flag = item.first.substr(0, 1);
+            continue;
+        }
+    }
+
+    ifstream in;
+    char line[1024]={'\0'};
+    in.open(file_name);
+    int i=0;
+    string tempStr;
+    while(in.getline(line,sizeof(line)))
+    {
+        i++;
+
+        string cur_line = line;
+        size_t start_index = cur_line.find(target);
+
+        if (start_index == string::npos){
+            tempStr += cur_line;
+        } else{
+            if (pattern == "a"){
+                tempStr += cur_line.substr(0, start_index + target.length());
+                tempStr += replacement;
+                tempStr += cur_line.substr(start_index + target.length());
+            }
+
+            if (pattern == "d"){
+                tempStr += cur_line.substr(0, start_index - 1);
+            }
+
+            if (pattern == "u"){
+                tempStr += cur_line.substr(0, start_index);
+                tempStr += replacement;
+                tempStr += cur_line.substr(start_index + target.length());
+            }
+        }
+
+        tempStr+='\n';
+    }
+    in.close();
+    ofstream out;
+    out.open(file_name);
+    out.flush();
+    out<<tempStr;
+    out.close();
 
     return 0;
 }
