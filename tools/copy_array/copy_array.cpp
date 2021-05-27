@@ -10,7 +10,7 @@ char** copy(char **command){
         return command;
     }
 
-    char **out = new char *[position];
+    char **out = new char *[position + 1];
     for (int i = 0; i < position; ++i) {
         out[i] = command[i];
     }
