@@ -5,5 +5,7 @@
 #include <cstdio>
 #include <string>
 
+#include "../parse/parseCommand.h"
+
 using namespace std;
 char** copy(char **command);

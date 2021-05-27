@@ -24,6 +24,16 @@ int find_question(char **command) {
     return -1;
 }
 
+int find_split(char **command, char *s){
+    for (int i = 0; command[i] != nullptr; ++i) {
+        if (strcmp(command[i], s) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 vector<int> find_all_target_position(const string& s, const string& target){
     vector<int> result;
     size_t position=0;

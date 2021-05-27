@@ -5,8 +5,16 @@
 #include "copy_array.h"
 
 char** copy(char **command){
-    char** out;
-    while (*command!=","){
-
+    int position = find_split(command, ";");
+    if (position == -1){
+        return command;
     }
+
+    char **out = new char *[position];
+    for (int i = 0; i < position; ++i) {
+        out[i] = command[i];
+    }
+    out[position] = nullptr;
+
+    return out;
 }

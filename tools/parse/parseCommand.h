@@ -13,4 +13,6 @@ int find_pipe(char **command);
 
 int find_question(char **command);
 
+int find_split(char **command, char *);
+
 vector<int> find_all_target_position(const string&, const string&);
