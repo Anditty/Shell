@@ -57,10 +57,10 @@ void cmd::cmd_loop() {
             continue;
         }
 
-        vector<string> array = split_to_vec(line);
+        vector<string> array = split(line, " ");
         char **command = new char *[array.size() + 1];
         for (int i = 0; i < array.size(); ++i) {
-            command[i] = (char *)array[i].c_str();
+            command[i] = (char *) array[i].c_str();
         }
         command[array.size()] = nullptr;
 
@@ -128,6 +128,8 @@ int cmd::cmd_select(char **command) {
                 case 6:
                     execute_result = do_if(command);
                     break;
+                case 7:
+                    execute_result = do_sed(command[1], command[2]);
                 default:
                     break;
             }
@@ -436,6 +438,8 @@ int cmd::is_control_command(const char *cmd){
     return (strcmp(cmd,"if")==0||strcmp(cmd,"then")==0||strcmp(cmd,"fi")==0||strcmp(cmd,"else")==0);
 }
 
+int cmd::do_if(char *const *args) {
+    int last_stat = 0;
 int cmd::do_if(char *const *args){
     int last_stat;
     const char *command = args[0];
@@ -479,8 +483,6 @@ int cmd::do_if(char *const *args){
             if_state = NEUTRAL;
             rv = 0;
         }
-        return rv;
-
     }
         args+=2;
         if(args[0]!= nullptr&&is_control_command(args[0])){
@@ -497,9 +499,11 @@ int cmd::ok_to_execute(){
     }
     else if(if_state == THEN_BLOCK && if_result == FAIL) {
         rv = 0;
+        perror("if_state error6");
     }
     else if(if_state == ELSE_BLOCK && if_result == SUCCESS) {
         rv = 0;
+        perror("if_state error7");
     }
     return rv;
 }
@@ -511,7 +515,8 @@ int cmd::process(char *const *arglist){
     if(is_control_command(arglist[0]))
         rv = do_if(arglist);
     else if(ok_to_execute()) {
-        rv=cmd_select(const_cast<char **>(arglist));
+        cmd_select(const_cast<char **>(arglist));
+        rv=0;
     }
     return rv;
 }
@@ -529,25 +534,111 @@ void cmd::update_prompt() {
 }
 
 int cmd::do_sed(const char *script, const char *file_name) {
-    //vector<pair<string, int>> scripts = parse_sed_script(script);
+    vector<pair<string, int>> scripts = parse_sed_script(script);
 
-    //    ifstream in;
-//    char line[1024]={'\0'};
-//    in.open(file_name);
-//    int i=0;
-//    string tempStr;
-//    while(in.getline(line,sizeof(line)))
-//    {
-//        i++;
-//
-//        tempStr+='\n';
-//    }
-//    in.close();
-//    ofstream out;
-//    out.open(file_name);
-//    out.flush();
-//    out<<tempStr;
-//    out.close();
+    int lines[2] = {1, INT32_MAX};
+    int line_index = 0;
+    string sed_operator = "d";
+    string target;
+    string replacement;
+    int flag = 1;
+
+    for (const auto &item : scripts) {
+        if (item.second == 0 && line_index < 2) {
+            if (check_is_num(item.first)) {
+                lines[line_index] = stoi(item.first);
+            }
+            line_index++;
+            continue;
+        }
+
+        if (item.second == 1) {
+            sed_operator = item.first.substr(0, 1);
+            target = item.first.substr(1);
+            continue;
+        }
+
+        if (item.second == 2) {
+            replacement = item.first;
+            continue;
+        }
+
+        if (item.second == 3) {
+            if (check_is_num(item.first.substr(0, 1))) {
+                flag = stoi(item.first.substr(0, 1));
+            }
+            continue;
+        }
+    }
+
+    if (scripts[0].first.length() == 0 && line_index == 1) {
+        line_index = 0;
+    }
+
+    ifstream in;
+    char line[1024] = {'\0'};
+    in.open(file_name);
+    int i = 0;
+    string tempStr;
+    while (in.getline(line, sizeof(line))) {
+        i++;
+        string cur_line = line;
+        vector<int> all_index = find_all_target_position(cur_line, target);
+        size_t start_index;
+        if (target.length() > 0) {
+            start_index = all_index[flag < all_index.size() ? flag : all_index.size() - 1];
+        } else{
+            start_index = sed_operator == "i" ? 0 : cur_line.length();
+        }
+
+        if ((i < lines[0] || i > lines[1]) || (line_index == 1 && i != lines[0]) || start_index == string::npos) {
+            tempStr += cur_line;
+        } else {
+            if (sed_operator == "a") {
+                tempStr += cur_line.substr(0, start_index + target.length());
+                if (target.length() == 0) {
+                    tempStr += "\n";
+                }
+                tempStr += replacement;
+                tempStr += cur_line.substr(start_index + target.length());
+            }
+
+            if (sed_operator == "d") {
+                tempStr += cur_line.substr(0, start_index);
+            }
+
+            if (sed_operator == "u") {
+                tempStr += cur_line.substr(0, start_index);
+                tempStr += replacement;
+                tempStr += cur_line.substr(start_index + target.length());
+            }
+
+            if (sed_operator == "p") {
+                tempStr += cur_line;
+                cout << "row " << i << ": " << cur_line << endl;
+            }
+
+            if (sed_operator == "i") {
+                tempStr += cur_line.substr(0, start_index);
+                tempStr += replacement;
+                if (target.length() == 0) {
+                    tempStr += "\n";
+                }
+                tempStr += cur_line.substr(start_index);
+            }
+        }
+
+        if (sed_operator == "d" && target.length() == cur_line.length()) {
+            continue;
+        }
+        tempStr += '\n';
+    }
+    in.close();
+    ofstream out;
+    out.open(file_name);
+    out.flush();
+    out << tempStr;
+    out.close();
 
     return 0;
 }

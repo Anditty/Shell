@@ -54,3 +54,17 @@ int min_modify_dist(string word1, string word2) {
     }
     return D[n][m];
 }
+
+
+bool check_is_num(const string& str)
+{
+    stringstream sin(str);
+    int c;
+
+    if (sin >> c)
+    {
+        return true;
+    }
+
+    return false;
+}

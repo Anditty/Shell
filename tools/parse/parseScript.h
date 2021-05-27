@@ -9,4 +9,4 @@ using namespace std;
 
 vector<string> split_script(const string&, const string&);
 
-vector<pair<string, int>> parse_sed_script(char *);
+vector<pair<string, int>> parse_sed_script(const char *);

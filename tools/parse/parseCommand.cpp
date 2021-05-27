@@ -3,28 +3,6 @@
 //
 #include "parseCommand.h"
 
-vector<string> split_to_vec(const string &command){
-    vector<string> array;
-    stringstream ss(command);
-    string temp;
-
-    while (ss >> temp)
-        array.emplace_back(temp);
-
-    return array;
-}
-
-char **split_command(const string &command) {
-    vector<string> array = split_to_vec(command);
-
-    char **args = new char *[array.size() + 1];
-    for (int i = 0; i < array.size(); ++i) {
-        args[i] = (char *) array[i].c_str();
-    }
-    args[array.size()] = nullptr;
-
-    return args;
-}
 
 int find_pipe(char **command) {
     for (int i = 0; command[i] != nullptr; ++i) {
@@ -44,4 +22,14 @@ int find_question(char **command) {
     }
 
     return -1;
+}
+
+vector<int> find_all_target_position(const string& s, const string& target){
+    vector<int> result;
+    int position=0;
+    while((position=(int )s.find(target,position))!=string::npos)
+    {
+        result.push_back(position);
+        position++;
+    }
 }
