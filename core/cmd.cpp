@@ -42,6 +42,12 @@ cmd::cmd() {
     this->user = pw->pw_name;
     this->hostname = (string) (cur_hostname);
 
+    // set doc path
+    char cur_path[80];
+    getcwd(cur_path, sizeof(cur_path));
+    this->doc = cur_path;
+    this->doc += "/doc/";
+
     //set status
     this->status = 1;
 }
@@ -412,7 +418,7 @@ int cmd::pipe_handler(char *const *command, int position) {
 int cmd::question_handler(const char *command) {
     char buffer[1024];
     string file_name = command;
-    ifstream in("doc/" + file_name);
+    ifstream in(this->doc + file_name);
     if (!in.is_open()) {
         printf("command not exist\n");
 
@@ -621,6 +627,9 @@ int cmd::do_sed(const char *script, const char *file_name) {
 
             if (sed_operator == "d") {
                 tempStr += cur_line.substr(0, start_index);
+                if ((target.length() == cur_line.length() || target.length() == 0)) {
+                    continue;
+                }
             }
 
             if (sed_operator == "u") {
@@ -644,9 +653,6 @@ int cmd::do_sed(const char *script, const char *file_name) {
             }
         }
 
-        if (sed_operator == "d" && target.length() == cur_line.length()) {
-            continue;
-        }
         tempStr += '\n';
     }
     in.close();
