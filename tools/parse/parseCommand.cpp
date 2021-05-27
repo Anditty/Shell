@@ -30,7 +30,7 @@ vector<int> find_all_target_position(const string& s, const string& target){
     while((position=s.find(target,position))!=string::npos)
     {
         result.push_back((int )position);
-        position++;
+        position += target.length();
     }
 
     return result;
