@@ -438,215 +438,205 @@ int cmd::is_control_command(const char *cmd){
     return (strcmp(cmd,"if")==0||strcmp(cmd,"then")==0||strcmp(cmd,"fi")==0||strcmp(cmd,"else")==0);
 }
 
-int cmd::do_if(char *const *args) {
-    int last_stat = 0;
-int cmd::do_if(char *const *args){
-    int last_stat;
-    const char *command = args[0];
-    int rv = -1;
-    if(strcmp(command, "if") == 0){
-        if(if_state != NEUTRAL)
-            perror("if_state error1");
-        else{
-            last_stat = process(args + 1);//执行if后的命令
-            if_result = (last_stat == 0 ? SUCCESS:FAIL);
-            if_state = WANT_THEN;
+
+    int cmd::do_if(char *const *args) {
+        int last_stat;
+        const char *command = args[0];
+        int rv = -1;
+        if (strcmp(command, "if") == 0) {
+            if (if_state != NEUTRAL)
+                perror("if_state error1");
+            else {
+                last_stat = process(args + 1);//执行if后的命令
+                if_result = (last_stat == 0 ? SUCCESS : FAIL);
+                if_state = WANT_THEN;
+                rv = 0;
+                if (if_result == SUCCESS) {
+                    printf("\x1b[;%dm%s\x1b[%dm", 32, "IF CONDITION EXECUTE SUCCESS!\n", 0);
+                } else {
+                    printf("\x1b[;%dm%s\x1b[%dm", 31, "IF CONDITION EXECUTE FAILED!\n", 0);
+                }
+            }
+        } else if (strcmp(command, "then") == 0) {
+            if (if_state != WANT_THEN)
+                perror("if_state error2");
+            if_state = THEN_BLOCK;
+            if (ok_to_execute())
+                process(args + 1);
             rv = 0;
-            if(if_result==SUCCESS) {
-                printf("\x1b[;%dm%s\x1b[%dm", 32, "IF CONDITION EXECUTE SUCCESS!\n", 0);
-            } else{
-                printf("\x1b[;%dm%s\x1b[%dm", 31, "IF CONDITION EXECUTE FAILED!\n", 0);
+        } else if (strcmp(command, "else") == 0) {
+            if (if_state != THEN_BLOCK)
+                perror("if_state error3");
+            if_state = ELSE_BLOCK;
+            if (ok_to_execute())
+                process(args + 1);
+            rv = 0;
+
+        } else if (strcmp(command, "fi") == 0) {
+            if (if_state != ELSE_BLOCK)
+                perror("if_state error4");
+            else {
+                if_state = NEUTRAL;
+                rv = 0;
             }
         }
-    }
-    else if(strcmp(command, "then") == 0){
-        if(if_state != WANT_THEN)
-            perror("if_state error2");
-        if_state = THEN_BLOCK;
-        if(ok_to_execute())
-            process(args + 1);
-        rv = 0;
-    }
-    else if(strcmp(command, "else") == 0){
-        if(if_state != THEN_BLOCK)
-            perror("if_state error3");
-        if_state = ELSE_BLOCK;
-        if(ok_to_execute())
-            process(args + 1);
-        rv = 0;
-
-    }
-    else if(strcmp(command, "fi") == 0){
-        if(if_state!=ELSE_BLOCK)
-            perror("if_state error4");
-        else{
-            if_state = NEUTRAL;
-            rv = 0;
-        }
-    }
-        args+=2;
-        if(args[0]!= nullptr&&is_control_command(args[0])){
+        args += 2;
+        if (args[0] != nullptr && is_control_command(args[0])) {
             do_if(args);
         }
-    return rv;
-}
-
-int cmd::ok_to_execute(){
-    int rv = 1;
-    if(if_state == WANT_THEN){
-        perror("if_state error5");
-        rv = 0;
-    }
-    else if(if_state == THEN_BLOCK && if_result == FAIL) {
-        rv = 0;
-        perror("if_state error6");
-    }
-    else if(if_state == ELSE_BLOCK && if_result == SUCCESS) {
-        rv = 0;
-        perror("if_state error7");
-    }
-    return rv;
-}
-
-int cmd::process(char *const *arglist){
-    int rv = 0;
-    if(arglist[0] == nullptr)
         return rv;
-    if(is_control_command(arglist[0]))
-        rv = do_if(arglist);
-    else if(ok_to_execute()) {
-        cmd_select(const_cast<char **>(arglist));
-        rv=0;
-    }
-    return rv;
-}
-
-void cmd::update_prompt() {
-    this->prompt = "";
-    struct passwd *pw = getpwuid(getuid());
-    char cur_path[80];
-    getcwd(cur_path, sizeof(cur_path));
-    this->prompt += (string) pw->pw_name;
-    this->prompt += "@";
-    this->prompt += this->hostname + " ";
-    this->prompt += cur_path;
-    this->prompt += " > ";
-}
-
-int cmd::do_sed(const char *script, const char *file_name) {
-    vector<pair<string, int>> scripts = parse_sed_script(script);
-
-    int lines[2] = {1, INT32_MAX};
-    int line_index = 0;
-    string sed_operator = "d";
-    string target;
-    string replacement;
-    int flag = 1;
-
-    for (const auto &item : scripts) {
-        if (item.second == 0 && line_index < 2) {
-            if (check_is_num(item.first)) {
-                lines[line_index] = stoi(item.first);
-            }
-            line_index++;
-            continue;
-        }
-
-        if (item.second == 1) {
-            sed_operator = item.first.substr(0, 1);
-            target = item.first.substr(1);
-            continue;
-        }
-
-        if (item.second == 2) {
-            replacement = item.first;
-            continue;
-        }
-
-        if (item.second == 3) {
-            if (check_is_num(item.first.substr(0, 1))) {
-                flag = stoi(item.first.substr(0, 1));
-            }
-            continue;
-        }
     }
 
-    if (scripts[0].first.length() == 0 && line_index == 1) {
-        line_index = 0;
+    int cmd::ok_to_execute() {
+        int rv = 1;
+        if (if_state == WANT_THEN) {
+            perror("if_state error5");
+            rv = 0;
+        } else if (if_state == THEN_BLOCK && if_result == FAIL) {
+            rv = 0;
+            perror("if_state error6");
+        } else if (if_state == ELSE_BLOCK && if_result == SUCCESS) {
+            rv = 0;
+            perror("if_state error7");
+        }
+        return rv;
     }
 
-    ifstream in;
-    char line[1024] = {'\0'};
-    in.open(file_name);
-    int i = 0;
-    string tempStr;
-    while (in.getline(line, sizeof(line))) {
-        i++;
-        string cur_line = line;
-        vector<int> all_index = find_all_target_position(cur_line, target);
-        size_t start_index;
-        if (target.length() > 0) {
-            start_index = all_index[flag < all_index.size() ? flag : all_index.size() - 1];
-        } else{
-            start_index = sed_operator == "i" ? 0 : cur_line.length();
+    int cmd::process(char *const *arglist) {
+        int rv = 0;
+        if (arglist[0] == nullptr)
+            return rv;
+        if (is_control_command(arglist[0]))
+            rv = do_if(arglist);
+        else if (ok_to_execute()) {
+            cmd_select(const_cast<char **>(arglist));
+            rv = 0;
         }
+        return rv;
+    }
 
-        if ((i < lines[0] || i > lines[1]) || (line_index == 1 && i != lines[0]) || start_index == string::npos) {
-            tempStr += cur_line;
-        } else {
-            if (sed_operator == "a") {
-                tempStr += cur_line.substr(0, start_index + target.length());
-                if (target.length() == 0) {
-                    tempStr += "\n";
+    void cmd::update_prompt() {
+        this->prompt = "";
+        struct passwd *pw = getpwuid(getuid());
+        char cur_path[80];
+        getcwd(cur_path, sizeof(cur_path));
+        this->prompt += (string) pw->pw_name;
+        this->prompt += "@";
+        this->prompt += this->hostname + " ";
+        this->prompt += cur_path;
+        this->prompt += " > ";
+    }
+
+    int cmd::do_sed(const char *script, const char *file_name) {
+        vector<pair<string, int>> scripts = parse_sed_script(script);
+
+        int lines[2] = {1, INT32_MAX};
+        int line_index = 0;
+        string sed_operator = "d";
+        string target;
+        string replacement;
+        int flag = 1;
+
+        for (const auto &item : scripts) {
+            if (item.second == 0 && line_index < 2) {
+                if (check_is_num(item.first)) {
+                    lines[line_index] = stoi(item.first);
                 }
-                tempStr += replacement;
-                tempStr += cur_line.substr(start_index + target.length());
+                line_index++;
+                continue;
             }
 
-            if (sed_operator == "d") {
-                tempStr += cur_line.substr(0, start_index);
+            if (item.second == 1) {
+                sed_operator = item.first.substr(0, 1);
+                target = item.first.substr(1);
+                continue;
             }
 
-            if (sed_operator == "u") {
-                tempStr += cur_line.substr(0, start_index);
-                tempStr += replacement;
-                tempStr += cur_line.substr(start_index + target.length());
+            if (item.second == 2) {
+                replacement = item.first;
+                continue;
             }
 
-            if (sed_operator == "p") {
+            if (item.second == 3) {
+                if (check_is_num(item.first.substr(0, 1))) {
+                    flag = stoi(item.first.substr(0, 1));
+                }
+                continue;
+            }
+        }
+
+        if (scripts[0].first.length() == 0 && line_index == 1) {
+            line_index = 0;
+        }
+
+        ifstream in;
+        char line[1024] = {'\0'};
+        in.open(file_name);
+        int i = 0;
+        string tempStr;
+        while (in.getline(line, sizeof(line))) {
+            i++;
+            string cur_line = line;
+            size_t start_index;
+            if (target.length() > 0) {
+                vector<int> all_index = find_all_target_position(cur_line, target);
+                if (all_index.empty()){
+                    start_index = string::npos;
+                } else{
+                    start_index = all_index[flag <= all_index.size() ? flag - 1 : all_index.size() - 1];
+                }
+            } else {
+                start_index = sed_operator == "i" || sed_operator == "d" ? 0 : cur_line.length();
+            }
+
+            if ((i < lines[0] || i > lines[1]) || (line_index == 1 && i != lines[0]) || start_index == string::npos) {
                 tempStr += cur_line;
-                cout << "row " << i << ": " << cur_line << endl;
-            }
-
-            if (sed_operator == "i") {
-                tempStr += cur_line.substr(0, start_index);
-                tempStr += replacement;
-                if (target.length() == 0) {
-                    tempStr += "\n";
+            } else {
+                if (sed_operator == "a") {
+                    tempStr += cur_line.substr(0, start_index + target.length());
+                    if (target.length() == 0) {
+                        tempStr += "\n";
+                    }
+                    tempStr += replacement;
+                    tempStr += cur_line.substr(start_index + target.length());
                 }
-                tempStr += cur_line.substr(start_index);
+
+                if (sed_operator == "d") {
+                    tempStr += cur_line.substr(0, start_index);
+                }
+
+                if (sed_operator == "u") {
+                    tempStr += cur_line.substr(0, start_index);
+                    tempStr += replacement;
+                    tempStr += cur_line.substr(start_index + target.length());
+                }
+
+                if (sed_operator == "p") {
+                    tempStr += cur_line;
+                    cout << "row " << i << ": " << cur_line << endl;
+                }
+
+                if (sed_operator == "i") {
+                    tempStr += cur_line.substr(0, start_index);
+                    tempStr += replacement;
+                    if (target.length() == 0) {
+                        tempStr += "\n";
+                    }
+                    tempStr += cur_line.substr(start_index);
+                }
             }
-        }
 
-        if (sed_operator == "d" && target.length() == cur_line.length()) {
-            continue;
+            if (sed_operator == "d" && target.length() == cur_line.length()) {
+                continue;
+            }
+            tempStr += '\n';
         }
-        tempStr += '\n';
+        in.close();
+        ofstream out;
+        out.open(file_name);
+        out.flush();
+        out << tempStr;
+        out.close();
+
+        return 0;
     }
-    in.close();
-    ofstream out;
-    out.open(file_name);
-    out.flush();
-    out << tempStr;
-    out.close();
-
-    return 0;
-}
-
-
-
-
-
-
-
-

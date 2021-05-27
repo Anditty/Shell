@@ -26,10 +26,12 @@ int find_question(char **command) {
 
 vector<int> find_all_target_position(const string& s, const string& target){
     vector<int> result;
-    int position=0;
-    while((position=(int )s.find(target,position))!=string::npos)
+    size_t position=0;
+    while((position=s.find(target,position))!=string::npos)
     {
-        result.push_back(position);
+        result.push_back((int )position);
         position++;
     }
+
+    return result;
 }
