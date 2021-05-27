@@ -534,22 +534,24 @@ void cmd::update_prompt() {
 int cmd::do_sed(const char *script, const char *file_name) {
     vector<pair<string, int>> scripts = parse_sed_script(script);
 
-    int lines[2] = {0, INT32_MAX};
+    int lines[2] = {1, INT32_MAX};
     int line_index = 0;
-    string pattern = "d";
+    string sed_operator = "d";
     string target;
     string replacement;
     string flag = "g";
 
     for (const auto &item : scripts){
         if (item.second==0 && line_index < 2){
-            lines[line_index] = stoi(item.first);
+            if (check_is_num(item.first)){
+                lines[line_index] = stoi(item.first);
+            }
             line_index++;
             continue;
         }
 
         if (item.second == 1){
-            pattern = item.first.substr(0, 1);
+            sed_operator = item.first.substr(0, 1);
             target = item.first.substr(1);
             continue;
         }
@@ -565,6 +567,10 @@ int cmd::do_sed(const char *script, const char *file_name) {
         }
     }
 
+    if (scripts[0].first.length() == 0 && line_index == 1){
+        line_index = 0;
+    }
+
     ifstream in;
     char line[1024]={'\0'};
     in.open(file_name);
@@ -573,30 +579,49 @@ int cmd::do_sed(const char *script, const char *file_name) {
     while(in.getline(line,sizeof(line)))
     {
         i++;
-
         string cur_line = line;
-        size_t start_index = cur_line.find(target);
+        size_t start_index = target.length() > 0? cur_line.find(target) : (sed_operator == "i" ? 0 : cur_line.length());
 
-        if (start_index == string::npos){
+        if ((i < lines[0] || i > lines[1]) || (line_index == 1 && i != lines[0]) || start_index == string::npos){
             tempStr += cur_line;
         } else{
-            if (pattern == "a"){
+            if (sed_operator == "a"){
                 tempStr += cur_line.substr(0, start_index + target.length());
+                if (target.length() == 0){
+                    tempStr += "\n";
+                }
                 tempStr += replacement;
                 tempStr += cur_line.substr(start_index + target.length());
             }
 
-            if (pattern == "d"){
-                tempStr += cur_line.substr(0, start_index - 1);
+            if (sed_operator == "d"){
+                tempStr += cur_line.substr(0, start_index);
             }
 
-            if (pattern == "u"){
+            if (sed_operator == "u"){
                 tempStr += cur_line.substr(0, start_index);
                 tempStr += replacement;
                 tempStr += cur_line.substr(start_index + target.length());
             }
+
+            if (sed_operator == "p"){
+                tempStr += cur_line;
+                cout << "row " << i << ": " << cur_line << endl;
+            }
+
+            if (sed_operator == "i"){
+                tempStr += cur_line.substr(0, start_index);
+                tempStr += replacement;
+                if (target.length() == 0){
+                    tempStr += "\n";
+                }
+                tempStr += cur_line.substr(start_index);
+            }
         }
 
+        if (sed_operator == "d" && target.length() == cur_line.length()){
+            continue;
+        }
         tempStr+='\n';
     }
     in.close();

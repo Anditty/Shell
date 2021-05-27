@@ -17,9 +17,7 @@ vector<string> split_script(const string& s, const string& c) {
         pos2 = s.find(c, pos1);
     }
 
-    if(pos1 != s.length()) {
-        scripts.push_back(s.substr(pos1));
-    }
+    scripts.push_back(s.substr(pos1));
 
     return scripts;
 }
@@ -28,12 +26,14 @@ vector<pair<string, int>> parse_sed_script(const char *script){
     vector<pair<string, int>> result;
 
     vector<string> scripts = split_script(script, string("/"));
-    if (scripts.size() == 4){
-        for (int i = 0; i < 4; ++i) {
-            vector<string> tmp = split_script(scripts[i], ";");
+    for (int i = 0; i < scripts.size(); ++i) {
+        if (i == 0){
+            vector<string> tmp = split_script(scripts[i], ",");
             for (const auto &item : tmp){
                 result.emplace_back(item, i);
             }
+        } else{
+            result.emplace_back(scripts[i], i);
         }
     }
 

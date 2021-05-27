@@ -63,8 +63,8 @@ bool check_is_num(const string& str)
 
     if (sin >> c)
     {
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
 }
