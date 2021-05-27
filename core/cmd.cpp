@@ -1,6 +1,14 @@
 #include "cmd.h"
 
 using namespace std;
+enum states {
+    NEUTRAL, WANT_THEN, THEN_BLOCK, ELSE_BLOCK
+};
+enum results {
+    SUCCESS, FAIL
+};
+static int if_state = NEUTRAL;
+static int if_result = SUCCESS;
 
 cmd::cmd() {
     // set builtin commands
@@ -48,6 +56,7 @@ void cmd::cmd_loop() {
         cout << this->prompt;
 
         line = input_tab(this->prompt);
+        if_state=NEUTRAL;
         trim(line);
 
         // need to deal with space " "
@@ -365,7 +374,7 @@ int cmd::pipe_handler(char *const *command, int position) {
     if (pid_1 == 0) {
         // child 1
         close(data_pipe[0]);
-        dup2(data_pipe[1], 1); // copy std out to pipe write
+        dup2(data_pipe[1], 1); // copy_semi std out to pipe write
         close(data_pipe[1]);
         cmd_select(command_1);
         exit(0);
@@ -379,7 +388,7 @@ int cmd::pipe_handler(char *const *command, int position) {
         if (pid_2 == 0) {
             // child 2
             close(data_pipe[1]);
-            dup2(data_pipe[0], 0);// copy std in to pipe read
+            dup2(data_pipe[0], 0);// copy_semi std in to pipe read
             close(data_pipe[0]);
             cmd_select(command_2);
             exit(0);
@@ -436,14 +445,7 @@ int cmd::question_handler(const char *command) {
     }
 }
 
-enum states {
-    NEUTRAL, WANT_THEN, THEN_BLOCK, ELSE_BLOCK
-};
-enum results {
-    SUCCESS, FAIL
-};
-static int if_state = NEUTRAL;
-static int if_result = SUCCESS;
+
 
 int cmd::is_control_command(const char *cmd) {
     return (strcmp(cmd, "if") == 0 || strcmp(cmd, "then") == 0 || strcmp(cmd, "fi") == 0 || strcmp(cmd, "else") == 0);
@@ -494,7 +496,11 @@ int cmd::do_if(char *const *args) {
     }
 
     int semi_loc = find_split(const_cast<char **>(args), ";");
-    cout << semi_loc;
+    if (semi_loc==-1){
+        perror("Lack of Symbols: \";\"");
+        rv=1;
+        return rv;
+    }
     args += semi_loc+1;
     if (args[0] != nullptr && is_control_command(args[0])) {
         do_if(args);
@@ -521,8 +527,8 @@ int cmd::process(char *const *arglist) {
     if (is_control_command(arglist[0]))
         rv = do_if(arglist);
     else if (ok_to_execute()) {
-        cmd_select(const_cast<char **>(arglist));
-        rv = 0;
+        char ** command= copy_semi(const_cast<char **>(arglist));
+        rv=cmd_select(command);
     }
     return rv;
 }

@@ -27,6 +27,7 @@
 #include "../tools/trim/trim.h"
 #include "../tools/path/path.h"
 #include "../tools/input/tab.h"
+#include "../tools/copy_array/copy_array.h"
 
 
 using namespace std;

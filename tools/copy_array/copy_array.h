@@ -8,4 +8,4 @@
 #include "../parse/parseCommand.h"
 
 using namespace std;
-char** copy(char **command);
+char** copy_semi(char **command);

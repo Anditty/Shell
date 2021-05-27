@@ -4,7 +4,7 @@
 
 #include "copy_array.h"
 
-char** copy(char **command){
+char** copy_semi(char **command){
     int position = find_split(command, ";");
     if (position == -1){
         return command;
