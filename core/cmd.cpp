@@ -129,6 +129,13 @@ int cmd::cmd_select(char **command) {
                     execute_result = do_if(command);
                     break;
                 case 7:
+                    min_args = 2;
+                    if (command[min_args] == nullptr){
+                        question_handler(command[0]);
+                        execute_result = 1;
+                        break;
+                    }
+
                     execute_result = do_sed(command[1], command[2]);
                 default:
                     break;
@@ -394,7 +401,7 @@ int cmd::pipe_handler(char *const *command, int position) {
  * @param command
  */
 int cmd::question_handler(const char *command) {
-    char buffer[256];
+    char buffer[1024];
     string file_name = command;
     ifstream in("doc/" + file_name);
     if (!in.is_open()) {
@@ -420,7 +427,7 @@ int cmd::question_handler(const char *command) {
         return 1;
     } else {
         while (!in.eof()) {
-            in.getline(buffer, 100);
+            in.getline(buffer, 1024);
 //            cout << buffer << endl;
             printf("%s\n", buffer);
         }
