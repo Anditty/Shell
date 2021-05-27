@@ -45,6 +45,7 @@ cmd::cmd() {
     // set doc path
     char cur_path[80];
     getcwd(cur_path, sizeof(cur_path));
+//    this->doc = "/Users/anditty/Documents/PROJECT/GitHub/Shell/doc/";
     this->doc = cur_path;
     this->doc += "/doc/";
 
