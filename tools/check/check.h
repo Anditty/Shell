@@ -25,3 +25,5 @@ int check_file_stat(char *file_name);
 int min_modify_dist(string word1, string word2);
 
 bool check_is_num(const string&);
+
+bool check_command_args(int, char **);

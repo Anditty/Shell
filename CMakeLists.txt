@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(core)
 include_directories(tools/input)
 
-add_executable(
+add_executable(Shell
         core/cmd.cpp
         core/cmd.h
         tools/input/read.cpp

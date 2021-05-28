@@ -68,3 +68,13 @@ bool check_is_num(const string& str)
 
     return false;
 }
+
+bool check_command_args(int min_args, char **command){
+    for (int i = 1; i <= min_args; ++i) {
+        if (command[i] == nullptr) {
+            return false;
+        }
+    }
+
+    return true;
+}

@@ -103,20 +103,20 @@ int cmd::cmd_select(char **command) {
             switch (builtin_map[command[0]]) {
                 case 0:
                     min_args = 1;
-                    if (command[min_args] == nullptr) {
+                    if (!check_command_args(min_args, command)){
                         question_handler(command[0]);
                         execute_result = 1;
-                        break;
+                        return execute_result;
                     }
 
                     execute_result = do_cd(command[1]);
                     break;
                 case 1:
                     min_args = 1;
-                    if (command[min_args] == nullptr) {
+                    if (!check_command_args(min_args, command)){
                         question_handler(command[0]);
                         execute_result = 1;
-                        break;
+                        return execute_result;
                     }
 
                     execute_result = do_find(command[2] == nullptr ? nullptr : command[1],
@@ -124,10 +124,10 @@ int cmd::cmd_select(char **command) {
                     break;
                 case 2:
                     min_args = 2;
-                    if (command[min_args] == nullptr) {
+                    if (!check_command_args(min_args, command)){
                         question_handler(command[0]);
                         execute_result = 1;
-                        break;
+                        return execute_result;
                     }
 
                     execute_result = do_grep(command[1], command[2], command[3]);
@@ -146,15 +146,14 @@ int cmd::cmd_select(char **command) {
                     break;
                 case 7:
                     min_args = 2;
-                    for (int i = 1; i <= min_args; ++i) {
-                        if (command[i] == nullptr) {
-                            question_handler(command[0]);
-                            execute_result = 1;
-                            return execute_result;
-                        }
+                    if (!check_command_args(min_args, command)){
+                        question_handler(command[0]);
+                        execute_result = 1;
+                        return execute_result;
                     }
 
                     execute_result = do_sed(command[1], command[2]);
+                    break;
                 default:
                     break;
             }
